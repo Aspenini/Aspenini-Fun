@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aspenini Fun Hub</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <h1>Welcome to Aspenini Fun Hub!</h1>
@@ -17,8 +18,10 @@
     </div>
 
     <div class="game">
-        <h2>Game 2</h2>
-        <p><a href="/game2">Play Game 2</a></p>
+        <h2>Tetris</h2>
+        <a href="game2/index.html">
+            <img src="img/tetris_logo.jpg" alt="Tetris" class="bounce">
+        </a>
     </div>
 
     <div class="game">
@@ -31,5 +34,17 @@
     <footer>
         <p>© 2024 Aspenini Fun Hub</p>
     </footer>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then((registration) => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch((error) => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        }
+    </script>
 </body>
 </html>

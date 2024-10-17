@@ -1,50 +1,110 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aspenini Fun Hub</title>
+    <meta name="description" content="Aspenini.Fun - Your Hub for Fun HTML Games!">
+    <title>Aspenini.Fun - Game Hub</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <h1>Welcome to Aspenini Fun Hub!</h1>
-    <p>Choose a game below to start playing:</p>
 
-    <div class="game">
-        <h2>Game 1</h2>
-        <p><a href="/game1">Play Game 1</a></p>
-    </div>
+<div id="settings-menu" style="position: fixed; top: 10px; left: 10px;">
+    <img src="img/settings-icon.png" alt="Settings" style="width: 50px; cursor: pointer;" onclick="toggleSettingsMenu()">
+</div>
 
-    <div class="game">
-        <h2>Tetris</h2>
-        <a href="game2/index.html">
-            <img src="img/tetris_logo.jpg" alt="Tetris" class="bounce">
-        </a>
-    </div>
+<div id="settings-options" style="display: none; position: fixed; top: 70px; left: 10px; background-color: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <label for="theme-select">Choose a theme:</label>
+    <select id="theme-select" onchange="changeTheme(this.value)">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="blue">Blue</option>
+    </select>
+</div>
 
-    <div class="game">
-        <h2>Legacy Kevin Klicker</h2>
-        <a href="game3/index.html">
-            <img src="img/LegacyKevinKlicker.png" alt="Legacy Kevin Klicker" class="bounce">
-        </a>
-    </div>
+<script>
+    function toggleSettingsMenu() {
+        const settingsMenu = document.getElementById('settings-options');
+        if (settingsMenu.style.display === 'none') {
+            settingsMenu.style.display = 'block';
+        } else {
+            settingsMenu.style.display = 'none';
+        }
+    }
+
+    function changeTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.style.setProperty('--background-color', '#121212');
+            document.documentElement.style.setProperty('--text-color', '#ffffff');
+            document.documentElement.style.setProperty('--header-color', '#1E1E1E');
+        } else if (theme === 'light') {
+            document.documentElement.style.setProperty('--background-color', '#f4f4f4');
+            document.documentElement.style.setProperty('--text-color', '#333');
+            document.documentElement.style.setProperty('--header-color', '#4CAF50');
+        } else if (theme === 'blue') {
+            document.documentElement.style.setProperty('--background-color', '#dcefff');
+            document.documentElement.style.setProperty('--text-color', '#002d5f');
+            document.documentElement.style.setProperty('--header-color', '#003f88');
+        }
+    }
+</script>
+
+
+    <header>
+        Aspenini.Fun - Your Game Hub
+    </header>
+
+    <section>
+        <h2>Current Games</h2>
+        <div class="game-list">
+            <div class="game">
+                <a href="tetris/index.html">
+                    <img src="img/tetris.jpg" alt="Tetris">
+                    <h3>Tetris</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="eaglercraft/index.html">
+                    <img src="img/eaglercraft.jpg" alt="Eaglercraft">
+                    <h3>Eaglercraft</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="roulette/index.html">
+                    <img src="img/roulette.jpg" alt="Roulette">
+                    <h3>Roulette</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="space-invaders/index.html">
+                    <img src="img/space-invaders.jpg" alt="Space Invaders">
+                    <h3>Space Invaders</h3>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Legacy Games</h2>
+        <div class="game-list legacy-games">
+            <div class="game">
+                <a href="legacy-tetris/index.html">
+                    <img src="img/legacy-tetris.jpg" alt="Legacy Tetris">
+                    <h3>Legacy Tetris</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="legacy-kevin-klicker/index.html">
+                    <img src="img/legacy-kevin-klicker.png" alt="Kevin Klicker">
+                    <h3>Kevin Klicker</h3>
+                </a>
+            </div>
+        </div>
+    </section>
 
     <footer>
-        <p>© 2024 Aspenini Fun Hub</p>
+        © 2024 Aspenini.Fun - All rights reserved.
     </footer>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then((registration) => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                })
-                .catch((error) => {
-                    console.log('Service Worker registration failed:', error);
-                });
-        }
-    </script>
 </body>
 </html>

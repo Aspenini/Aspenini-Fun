@@ -1,77 +1,88 @@
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to right, #ff6f61, #ff9a8b);
-    text-align: center;
-    padding: 50px;
-    color: white;
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
     margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
-h1 {
-    font-size: 3em;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-p {
-    font-size: 1.2em;
-    margin-bottom: 40px;
+h2 {
+    font-size: 2em;
+    color: #333;
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.game-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px;
 }
 
 .game {
-    margin: 20px;
-    padding: 20px;
-    display: inline-block;
-    border: 2px solid white;
+    background-color: white;
+    border: 1px solid #ddd;
     border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background-color: rgba(255, 255, 255, 0.1);
+    margin: 15px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
 
 .game:hover {
     transform: scale(1.05);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-}
-
-.game h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    color: #ffdbdb;
-}
-
-.game a {
-    text-decoration: none;
-    color: #ffd1d1;
-    font-weight: bold;
-}
-
-.game a:hover {
-    color: #fff;
-}
-
-.game img {
-    width: 150px;
-    transition: transform 0.3s ease-in-out;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.game img:hover {
-    transform: scale(1.1);
     animation: bounce 0.5s;
 }
 
 @keyframes bounce {
-    0% { transform: translateY(0); }
-    30% { transform: translateY(-10px); }
-    60% { transform: translateY(5px); }
-    100% { transform: translateY(0); }
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.game img {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+}
+
+.game h3 {
+    color: #333;
+    margin-top: 10px;
+}
+
+.game a {
+    text-decoration: none;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.game a:hover {
+    color: #388E3C;
 }
 
 footer {
     margin-top: 50px;
-    color: #ffd1d1;
-    font-size: 0.9em;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    font-size: 1.2em;
 }

@@ -9,46 +9,34 @@
 </head>
 <body>
 
-<div id="settings-menu" style="position: fixed; top: 10px; left: 10px;">
-    <img src="img/settings-icon.png" alt="Settings" style="width: 50px; cursor: pointer;" onclick="toggleSettingsMenu()">
-</div>
+    <div id="settings-menu" style="position: fixed; top: 10px; left: 10px;">
+        <img src="img/settings-icon.png" alt="Settings" style="width: 50px; cursor: pointer;" onclick="toggleSettingsMenu()">
+    </div>
 
-<div id="settings-options" style="display: none; position: fixed; top: 70px; left: 10px; background-color: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <label for="theme-select">Choose a theme:</label>
-    <select id="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
-        <option value="blue">Blue</option>
-    </select>
-</div>
+    <div id="settings-options" style="display: none; position: fixed; top: 70px; left: 10px; background-color: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <label for="theme-select">Choose a theme:</label>
+        <select id="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="blue">Blue</option>
+        </select>
+    </div>
 
-<script>
-    function toggleSettingsMenu() {
-        const settingsMenu = document.getElementById('settings-options');
-        if (settingsMenu.style.display === 'none') {
-            settingsMenu.style.display = 'block';
-        } else {
-            settingsMenu.style.display = 'none';
+    <script>
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-options');
+            settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
         }
-    }
 
-    function changeTheme(theme) {
-        if (theme === 'dark') {
-            document.documentElement.style.setProperty('--background-color', '#121212');
-            document.documentElement.style.setProperty('--text-color', '#ffffff');
-            document.documentElement.style.setProperty('--header-color', '#1E1E1E');
-        } else if (theme === 'light') {
-            document.documentElement.style.setProperty('--background-color', '#f4f4f4');
-            document.documentElement.style.setProperty('--text-color', '#333');
-            document.documentElement.style.setProperty('--header-color', '#4CAF50');
-        } else if (theme === 'blue') {
-            document.documentElement.style.setProperty('--background-color', '#dcefff');
-            document.documentElement.style.setProperty('--text-color', '#002d5f');
-            document.documentElement.style.setProperty('--header-color', '#003f88');
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Save theme preference
         }
-    }
-</script>
 
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        changeTheme(savedTheme);
+    </script>
 
     <header>
         Aspenini.Fun - Your Game Hub
@@ -64,7 +52,55 @@
                 </a>
             </div>
             <div class="game">
-                <a href="eaglercraft/index.html">
+                <a href="other/retro-bowl.html">
+                    <img src="img/Retro_Bowl.webp" alt="Retro Bowl">
+                    <h3>Retro Bowl</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/baldis-basics.html">
+                    <img src="img/baldis-basics.jpg" alt="Baldi's Basics">
+                    <h3>Baldi's Basics</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/five-nights-at-freddys.html">
+                    <img src="img/FNAF1logo.jpg" alt="Five Nights at Freddy's">
+                    <h3>Five Nights at Freddy's</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/slither-io.html">
+                    <img src="img/slithery.jpg" alt="Slither.io">
+                    <h3>Slither.io</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/slope-3.html">
+                    <img src="img/slope-3.jpg" alt="Slope 3">
+                    <h3>Slope 3</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/geometry-dash.html">
+                    <img src="img/geometrydash.jpg" alt="Geometry Dash">
+                    <h3>Geometry Dash</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/uno.html">
+                    <img src="img/UNO.jpg" alt="Uno">
+                    <h3>Uno</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/happy-wheels.html">
+                    <img src="img/happywheels.jpg" alt="Happy Wheels">
+                    <h3>Happy Wheels</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/eaglercraft-v1.8.8.html">
                     <img src="img/eaglercraft.jpg" alt="Eaglercraft">
                     <h3>Eaglercraft</h3>
                 </a>
@@ -76,7 +112,7 @@
                 </a>
             </div>
             <div class="game">
-                <a href="space-invaders/index.html">
+                <a href="other/space-invaders.html">
                     <img src="img/space-invaders.jpg" alt="Space Invaders">
                     <h3>Space Invaders</h3>
                 </a>
@@ -86,17 +122,17 @@
 
     <section>
         <h2>Legacy Games</h2>
-        <div class="game-list legacy-games">
-            <div class="game">
+        <div class="legacy-games">
+            <div class="legacy-game">
                 <a href="legacy-tetris/index.html">
                     <img src="img/legacy-tetris.jpg" alt="Legacy Tetris">
                     <h3>Legacy Tetris</h3>
                 </a>
             </div>
-            <div class="game">
+            <div class="legacy-game">
                 <a href="legacy-kevin-klicker/index.html">
                     <img src="img/legacy-kevin-klicker.png" alt="Kevin Klicker">
-                    <h3>Kevin Klicker</h3>
+                    <h3>Legacy Kevin Klicker</h3>
                 </a>
             </div>
         </div>

@@ -1,12 +1,11 @@
-
 {
   "name": "Aspenini.Fun",
   "short_name": "Aspenini",
   "description": "Aspenini.Fun - Your Hub for Fun HTML Games!",
-  "start_url": "https://aspenini.github.io/Aspenini-Fun/index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
+  "theme_color": "#003f88",
   "icons": [
     {
       "src": "img/icon-192x192.png",

@@ -1,88 +1,81 @@
+/* CSS Variables for Themes */
+:root {
+    --background-color: #f9f9f9;
+    --text-color: #333;
+    --header-color: #003f88;
+}
 
+[data-theme="dark"] {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-color: #1E1E1E;
+}
+
+[data-theme="blue"] {
+    --background-color: #dcefff;
+    --text-color: #002d5f;
+    --header-color: #003f88;
+}
+
+/* General Styles */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
+    background-color: var(--background-color);
+    color: var(--text-color);
     margin: 0;
     padding: 0;
     text-align: center;
 }
 
 header {
-    background-color: #4CAF50;
+    background-color: var(--header-color);
     color: white;
     padding: 20px;
     font-size: 2.5em;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-h2 {
-    font-size: 2em;
-    color: #333;
-    margin-top: 40px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+/* Game List Styling */
+.game-list, .legacy-games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
-.game-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 20px;
-}
-
-.game {
+.game, .legacy-game {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 15px;
-    margin: 15px;
     padding: 20px;
-    width: 300px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    max-width: 300px; /* Limit the maximum width */
+    margin: auto; /* Center the game cards */
 }
 
-.game:hover {
-    transform: scale(1.05);
-    animation: bounce 0.5s;
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
+    .game:hover, .legacy-game:hover {
+        transform: scale(1.05);
     }
-    40% {
-        transform: translateY(-10px);
+
+    .game img, .legacy-game img {
+        width: 100%;
+        height: 150px; /* Ensures uniform height */
+        object-fit: cover; /* Ensures images do not stretch or skew */
+        border-radius: 15px;
     }
-    60% {
-        transform: translateY(-5px);
-    }
-}
-
-.game img {
-    width: 100%;
-    height: auto;
-    border-radius: 15px;
-}
-
-.game h3 {
-    color: #333;
-    margin-top: 10px;
-}
-
-.game a {
-    text-decoration: none;
-    color: #4CAF50;
-    font-weight: bold;
-}
-
-.game a:hover {
-    color: #388E3C;
-}
 
 footer {
     margin-top: 50px;
     padding: 20px;
-    background-color: #333;
+    background-color: var(--header-color);
     color: white;
     font-size: 1.2em;
+}
+
+/* Mobile-first Responsive Design */
+@media (min-width: 768px) {
+    .game-list, .legacy-games {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
 }

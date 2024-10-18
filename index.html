@@ -8,7 +8,10 @@
     <!-- Enable standalone mode on iPhone -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
+
+    <!-- PWA Icons for iOS -->
+    <link rel="apple-touch-icon" href="img/funky-icon-192.png">
+
     <title>Aspenini.Fun - Game Hub</title>
     
     <!-- Favicon for the website tab -->
@@ -60,73 +63,73 @@
         <h2>Current Games</h2>
         <div class="game-list">
             <div class="game">
-                <a href="tetris/index.html">
+                <a href="/tetris/index.html">
                     <img src="img/tetris.jpg" alt="Tetris">
                     <h3>Tetris</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/retro-bowl.html">
+                <a href="/other/retro-bowl.html">
                     <img src="img/Retro_Bowl.webp" alt="Retro Bowl">
                     <h3>Retro Bowl</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/baldis-basics.html">
+                <a href="/other/baldis-basics.html">
                     <img src="img/baldis-basics.jpg" alt="Baldi's Basics">
                     <h3>Baldi's Basics</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/five-nights-at-freddys.html">
+                <a href="/other/five-nights-at-freddys.html">
                     <img src="img/FNAF1logo.jpg" alt="Five Nights at Freddy's">
                     <h3>Five Nights at Freddy's</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/slither-io.html">
+                <a href="/other/slither-io.html">
                     <img src="img/slithery.jpg" alt="Slither.io">
                     <h3>Slither.io</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/slope-3.html">
+                <a href="/other/slope-3.html">
                     <img src="img/slope-3.jpg" alt="Slope 3">
                     <h3>Slope 3</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/geometry-dash.html">
+                <a href="/other/geometry-dash.html">
                     <img src="img/geometrydash.jpg" alt="Geometry Dash">
                     <h3>Geometry Dash</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/uno.html">
+                <a href="/other/uno.html">
                     <img src="img/UNO.jpg" alt="Uno">
                     <h3>Uno</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/happy-wheels.html">
+                <a href="/other/happy-wheels.html">
                     <img src="img/happywheels.jpg" alt="Happy Wheels">
                     <h3>Happy Wheels</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/eaglercraft-v1.8.8.html">
+                <a href="/other/eaglercraft-v1.8.8.html">
                     <img src="img/eaglercraft.jpg" alt="Eaglercraft">
                     <h3>Eaglercraft</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="roulette/index.html">
+                <a href="/roulette/index.html">
                     <img src="img/roulette.jpg" alt="Roulette">
                     <h3>Roulette</h3>
                 </a>
             </div>
             <div class="game">
-                <a href="other/space-invaders.html">
+                <a href="/other/space-invaders.html">
                     <img src="img/space-invaders.jpg" alt="Space Invaders">
                     <h3>Space Invaders</h3>
                 </a>
@@ -139,13 +142,13 @@
         <h2>Legacy Games</h2>
         <div class="legacy-games">
             <div class="legacy-game">
-                <a href="legacy-tetris/index.html">
+                <a href="/legacy-tetris/index.html">
                     <img src="img/legacy-tetris.jpg" alt="Legacy Tetris">
                     <h3>Legacy Tetris</h3>
                 </a>
             </div>
             <div class="legacy-game">
-                <a href="legacy-kevin-klicker/index.html">
+                <a href="/legacy-kevin-klicker/index.html">
                     <img src="img/legacy-kevin-klicker.png" alt="Kevin Klicker">
                     <h3>Legacy Kevin Klicker</h3>
                 </a>
@@ -169,7 +172,21 @@
                 });
             });
         }
+
+        // Ensure links open within the app (without opening external browser)
+        document.addEventListener('click', function(event) {
+            let target = event.target;
+            while (target && target.tagName !== 'A') {
+                target = target.parentNode;
+            }
+
+            if (target && target.tagName === 'A' && target.href.startsWith(window.location.origin)) {
+                event.preventDefault();
+                window.location.href = target.href;
+            }
+        });
     </script>
 
 </body>
 </html>
+

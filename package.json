@@ -35,7 +35,7 @@
       "icon": "icon/aspenini-fun-mac.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": ["AppImage", "deb", "flatpak"],
       "category": "Game",
       "icon": "icon/icons"
     },

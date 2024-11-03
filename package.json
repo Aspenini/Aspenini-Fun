@@ -1,0 +1,14 @@
+{
+  "name": "Aspenini",
+  "version": "1.0.0",
+  "description": "An Electron app for launching HTML web games.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Aspenini",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "1.0.0"
+  }
+}

@@ -5,9 +5,9 @@ const urlsToCache = [
     '/',
     '/index.html',
     '/style.css',
-    '/funky-icon.png',
-    '/img/funky-icon-192.png',
-    '/img/funky-icon-512.png',
+    '/icon/funky-icon.png',
+    '/icon/funky-icon-192.png',
+    '/icon/funky-icon-512.png',
     // Add other assets for caching (game files, images, etc.)
 ];
 

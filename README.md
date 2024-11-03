@@ -4,8 +4,6 @@ A game hub for my HTML web games!
 
 ![funky-icon](https://github.com/user-attachments/assets/bf316df7-99b9-4deb-ab45-5af783207e2f)
 
-**PLAY ONLINE: [https://aspenini.github.io/Aspenini-Fun/](https://aspenini.github.io/Aspenini-Fun/)**
-
 ## Overview
 
 Aspenini.Fun is a curated game hub that provides easy access to a collection of HTML games. Designed for quick access and ease of use, you can play games directly online or download the desktop version for offline fun.

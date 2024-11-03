@@ -1,0 +1,51 @@
+{
+  "name": "aspenini-fun",
+  "version": "1.7.3",
+  "description": "An Electron app for launching HTML web games.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "author": "Aspenini",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^24.6.0"
+  },
+  "build": {
+    "appId": "com.aspenini.gameLauncher",
+    "productName": "Aspenini-Fun",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/funky-icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.games",
+      "icon": "build/aspenini-fun-mac.icns"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Game",
+      "icon": "build/icons"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Aspenini",
+        "repo": "Aspenini-Fun"
+      }
+    ]
+  }
+}
+

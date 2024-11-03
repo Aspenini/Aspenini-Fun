@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aspenini.Fun - Your Hub for Fun HTML Games!">
+    
+    <!-- Enable standalone mode on iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA Icons for iOS -->
+    <link rel="apple-touch-icon" href="img/funky-icon-192.png">
+
+    <title>Aspenini.Fun - Game Hub</title>
+    
+    <!-- Favicon for the website tab -->
+    <link rel="icon" href="funky-icon.png" type="image/png">
+    
+    <!-- Include stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Settings menu for theme selection -->
+    <div id="settings-menu" style="position: fixed; top: 10px; left: 10px;">
+        <img src="img/settings-icon.png" alt="Settings" style="width: 50px; cursor: pointer;" onclick="toggleSettingsMenu()">
+    </div>
+
+    <div id="settings-options" style="display: none; position: fixed; top: 70px; left: 10px; background-color: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <label for="theme-select">Choose a theme:</label>
+        <select id="theme-select" onchange="changeTheme(this.value)">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="blue">Blue</option>
+        </select>
+    </div>
+
+    <!-- Theme management script -->
+    <script>
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-options');
+            settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Save the theme preference
+        }
+
+        // Load the saved theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        changeTheme(savedTheme);
+    </script>
+
+    <!-- Page header -->
+    <header>
+        Aspenini.Fun - Your Game Hub
+    </header>
+
+    <!-- Section for current games -->
+    <section>
+        <h2>Current Games</h2>
+        <div class="game-list">
+            <div class="game">
+                <a href="tetris/index.html">
+                    <img src="img/tetris.jpg" alt="Tetris">
+                    <h3>Tetris</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/retro-bowl.html">
+                    <img src="img/Retro_Bowl.webp" alt="Retro Bowl">
+                    <h3>Retro Bowl</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/baldis-basics.html">
+                    <img src="img/baldis-basics.jpg" alt="Baldi's Basics">
+                    <h3>Baldi's Basics</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/five-nights-at-freddys.html">
+                    <img src="img/FNAF1logo.jpg" alt="Five Nights at Freddy's">
+                    <h3>Five Nights at Freddy's</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/slither-io.html">
+                    <img src="img/slithery.jpg" alt="Slither.io">
+                    <h3>Slither.io</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/slope-3.html">
+                    <img src="img/slope-3.jpg" alt="Slope 3">
+                    <h3>Slope 3</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/geometry-dash.html">
+                    <img src="img/geometrydash.jpg" alt="Geometry Dash">
+                    <h3>Geometry Dash</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/uno.html">
+                    <img src="img/UNO.jpg" alt="Uno">
+                    <h3>Uno</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/happy-wheels.html">
+                    <img src="img/happywheels.jpg" alt="Happy Wheels">
+                    <h3>Happy Wheels</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/eaglercraft-v1.8.8.html">
+                    <img src="img/eaglercraft.jpg" alt="Eaglercraft">
+                    <h3>Eaglercraft</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="roulette/index.html">
+                    <img src="img/roulette.jpg" alt="Roulette">
+                    <h3>Roulette</h3>
+                </a>
+            </div>
+            <div class="game">
+                <a href="other/space-invaders.html">
+                    <img src="img/space-invaders.jpg" alt="Space Invaders">
+                    <h3>Space Invaders</h3>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section for legacy games -->
+    <section>
+        <h2>Legacy Games</h2>
+        <div class="legacy-games">
+            <div class="legacy-game">
+                <a href="legacy-tetris/index.html">
+                    <img src="img/legacy-tetris.jpg" alt="Legacy Tetris">
+                    <h3>Legacy Tetris</h3>
+                </a>
+            </div>
+            <div class="legacy-game">
+                <a href="legacy-kevin-klicker/index.html">
+                    <img src="img/legacy-kevin-klicker.png" alt="Kevin Klicker">
+                    <h3>Legacy Kevin Klicker</h3>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page footer -->
+    <footer>
+        © 2024 Aspenini.Fun - All rights reserved.
+    </footer>
+
+    <!-- Service Worker registration for caching and offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>

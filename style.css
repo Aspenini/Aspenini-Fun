@@ -1,0 +1,81 @@
+/* CSS Variables for Themes */
+:root {
+    --background-color: #f9f9f9;
+    --text-color: #333;
+    --header-color: #003f88;
+}
+
+[data-theme="dark"] {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-color: #1E1E1E;
+}
+
+[data-theme="blue"] {
+    --background-color: #dcefff;
+    --text-color: #002d5f;
+    --header-color: #003f88;
+}
+
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    background-color: var(--header-color);
+    color: white;
+    padding: 20px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Game List Styling */
+.game-list, .legacy-games {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.game, .legacy-game {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    max-width: 300px; /* Limit the maximum width */
+    margin: auto; /* Center the game cards */
+}
+
+    .game:hover, .legacy-game:hover {
+        transform: scale(1.05);
+    }
+
+    .game img, .legacy-game img {
+        width: 100%;
+        height: 150px; /* Ensures uniform height */
+        object-fit: cover; /* Ensures images do not stretch or skew */
+        border-radius: 15px;
+    }
+
+footer {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: var(--header-color);
+    color: white;
+    font-size: 1.2em;
+}
+
+/* Mobile-first Responsive Design */
+@media (min-width: 768px) {
+    .game-list, .legacy-games {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}

@@ -1,0 +1,15 @@
+# Ignore dependencies
+node_modules/
+
+# Ignore specific large files or folders you don't want in Git
+path/to/large_file.extension
+path/to/large_folder/
+
+# Ignore all files with certain extensions, e.g., large assets
+*.psd
+*.zip
+*.dll
+*.exe
+*.bin
+*.pak
+*.appimage

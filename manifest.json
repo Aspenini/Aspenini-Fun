@@ -1,0 +1,21 @@
+{
+  "name": "Aspenini.Fun",
+  "short_name": "Aspenini",
+  "description": "Aspenini.Fun - Your Hub for Fun HTML Games!",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#003f88",
+  "icons": [
+    {
+      "src": "img/funky-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/funky-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

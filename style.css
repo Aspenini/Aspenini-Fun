@@ -1,8 +1,10 @@
 /* CSS Variables for Themes */
 :root {
-    --background-color: #f9f9f9;
-    --text-color: #333;
-    --header-color: #003f88;
+    --background-color: #1b2838;
+    --text-color: #c7d5e0;
+    --header-color: #171a21;
+    --button-hover-color: #66c0f4;
+    --button-active-color: #66c0f4;
 }
 
 [data-theme="dark"] {
@@ -35,35 +37,64 @@ header {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Game List Styling */
-.game-list, .legacy-games {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
+/* Navigation bar styles */
+nav {
+    display: flex;
+    justify-content: center;
+    background-color: var(--header-color);
+    padding: 20px; /* Thicker panel */
 }
 
-.game, .legacy-game {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 15px;
+nav button {
+    padding: 10px 15px; /* Decrease width */
+    font-size: 1.2em; /* Larger text */
+    font-weight: bold; /* Bolder text */
+    text-transform: uppercase; /* All capital letters */
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 2px; /* Closer together */
+}
+
+nav button:hover, nav button.active {
+    background-color: var(--button-hover-color);
+    border-radius: 50px; /* More circular highlight area */
+    color: white;
+}
+
+/* Game List Styling */
+.game-list, .app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
     padding: 20px;
+    background-color: var(--background-color);
+    border-top: 2px solid var(--header-color);
+}
+
+.game, .app {
+    background-color: var(--header-color);
+    border: none;
+    border-radius: 15px;
+    padding: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    max-width: 300px; /* Limit the maximum width */
+    max-width: 200px; /* Limit the maximum width */
     margin: auto; /* Center the game cards */
 }
 
-    .game:hover, .legacy-game:hover {
-        transform: scale(1.05);
-    }
+.game:hover, .app:hover {
+    transform: scale(1.05);
+}
 
-    .game img, .legacy-game img {
-        width: 100%;
-        height: 150px; /* Ensures uniform height */
-        object-fit: cover; /* Ensures images do not stretch or skew */
-        border-radius: 15px;
-    }
+.game img, .app img {
+    width: 100%;
+    height: 300px; /* Ensures uniform height */
+    object-fit: cover; /* Ensures images do not stretch or skew */
+    border-radius: 15px;
+}
 
 footer {
     margin-top: 50px;
@@ -75,7 +106,7 @@ footer {
 
 /* Mobile-first Responsive Design */
 @media (min-width: 768px) {
-    .game-list, .legacy-games {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    .game-list, .app-list {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 }

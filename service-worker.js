@@ -8,7 +8,29 @@ const urlsToCache = [
     '/icon/funky-icon.png',
     '/icon/funky-icon-192.png',
     '/icon/funky-icon-512.png',
-    // Add other assets for caching (game files, images, etc.)
+    
+    // Cached games
+    '/games/Connect%20the%20Pipes.html',
+    '/games/EaglercraftX.html',
+    '/games/HTML%20Tower%20Defence.html',
+    '/games/Snakegame.html',
+    '/games/brick-breaker.html',
+    '/games/maze.html',
+    '/games/slopeoffline.html',
+    '/games/space-invaders.html',
+    '/games/tic-tac-toe.html',
+    '/games/legacy-kevin-klicker/index.html',
+    '/games/legacy-tetris/index.html',
+    '/games/roulette/index.html',
+    '/games/tetris/index.html',
+
+    // Cached apps
+    '/apps/adjustable-fireworks.html',
+    '/apps/aim-click-challenge.html',
+    '/apps/beepbox_offline.html',
+    '/apps/random-password.html',
+    '/apps/seeded-procedural-music.html',
+    '/apps/text-editor/index.html'
 ];
 
 // Install the service worker and cache files

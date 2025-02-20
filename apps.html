@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aspenini.Fun - Your Hub for Fun HTML Apps!">
+    
+    <!-- Enable standalone mode on iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA Icons for iOS -->
+    <link rel="apple-touch-icon" href="icon/funky-icon-192.png">
+
+    <title>Aspenini.Fun - Apps</title>
+    
+    <!-- Favicon for the website tab -->
+    <link rel="icon" href="icon/funky-icon.png" type="image/png">
+    
+    <!-- Include stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation bar for tabs -->
+    <nav>
+        <button class="tab" onclick="location.href='index.html'">Games</button>
+        <button class="tab active" onclick="location.href='apps.html'">Apps</button>
+        <button class="tab" onclick="location.href='settings.html'">Settings</button>
+    </nav>
+
+    <!-- Apps tab -->
+    <div id="apps" class="tab-content active">
+        <section>
+            <div class="app-list">
+                <!-- Add your app list here -->
+                <div class="app">
+                    <a href="apps/text-editor/index.html">
+                        <img src="img/textedit.png" alt="text-editor">
+                    </a>
+                </div>
+                <div class="app">
+                    <a href="apps/seeded-procedural-music.html">
+                        <img src="img/spm_generator.png" alt="spm-generator">
+                    </a>
+                </div>
+                <div class="app">
+                    <a href="apps/beepbox_offline.html">
+                        <img src="img/beepbox.png" alt="beepbox">
+                    </a>
+                </div>
+                <div class="app">
+                    <a href="apps/adjustable-fireworks.html">
+                        <img src="img/firework-engine.png" alt="firework-engine">
+                    </a>
+                </div>
+                <div class="app">
+                    <a href="apps/aim-click-challenge.html">
+                        <img src="img/aim-challenge.png" alt="aim-challenge">
+                    </a>
+                </div>
+                <div class="app">
+                    <a href="apps/random-password.html">
+                        <img src="img/random_password.png" alt="random-password">
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page footer -->
+    <footer>
+        © 2024 Aspenini.Fun - All rights reserved.
+    </footer>
+
+    <!-- JavaScript for tab functionality -->
+    <script>
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-options');
+            settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Save the theme preference
+        }
+
+        // Load the saved theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        changeTheme(savedTheme);
+    </script>
+
+    <!-- Service Worker registration for caching and offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>

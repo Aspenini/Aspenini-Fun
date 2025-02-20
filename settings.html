@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aspenini.Fun - Settings">
+    
+    <!-- Enable standalone mode on iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA Icons for iOS -->
+    <link rel="apple-touch-icon" href="icon/funky-icon-192.png">
+
+    <title>Aspenini.Fun - Settings</title>
+    
+    <!-- Favicon for the website tab -->
+    <link rel="icon" href="icon/funky-icon.png" type="image/png">
+    
+    <!-- Include stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation bar for tabs -->
+    <nav>
+        <button class="tab" onclick="location.href='index.html'">Games</button>
+        <button class="tab" onclick="location.href='apps.html'">Apps</button>
+        <button class="tab active" onclick="location.href='settings.html'">Settings</button>
+    </nav>
+
+    <!-- Settings tab -->
+    <div id="settings" class="tab-content active">
+        <div id="settings-options" style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <label for="theme-select">Choose a theme:</label>
+            <select id="theme-select" onchange="changeTheme(this.value)">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="blue">Blue</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Page footer -->
+    <footer>
+        © 2024 Aspenini.Fun - All rights reserved.
+    </footer>
+
+    <!-- JavaScript for tab functionality -->
+    <script>
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-options');
+            settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Save the theme preference
+        }
+
+        // Load the saved theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        changeTheme(savedTheme);
+    </script>
+
+    <!-- Service Worker registration for caching and offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>

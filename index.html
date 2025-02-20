@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aspenini.Fun - Your Hub for Fun HTML Games!">
+    
+    <!-- Enable standalone mode on iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA Icons for iOS -->
+    <link rel="apple-touch-icon" href="icon/funky-icon-192.png">
+
+    <title>Aspenini.Fun</title>
+    
+    <!-- Favicon for the website tab -->
+    <link rel="icon" href="icon/funky-icon.png" type="image/png">
+    
+    <!-- Include stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation bar for tabs -->
+    <nav>
+        <button class="tab active" onclick="location.href='index.html'">Games</button>
+        <button class="tab" onclick="location.href='apps.html'">Apps</button>
+        <button class="tab" onclick="location.href='settings.html'">Settings</button>
+    </nav>
+
+    <!-- Games tab -->
+    <div id="games" class="tab-content active">
+        <section>
+            <div class="game-list">
+                <div class="game">
+                    <a href="games/EaglercraftX.html">
+                        <img src="img/eaglercraft.png" alt="Eaglercraft">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/tetris/index.html">
+                        <img src="img/tetris.png" alt="Tetris">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/legacy-tetris/index.html">
+                        <img src="img/legacytetris.png" alt="Legacy Tetris">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/legacy-kevin-klicker/index.html">
+                        <img src="img/kevin-klicker.png" alt="Kevin Klicker">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/space-invaders.html">
+                        <img src="img/spaceinvaders.png" alt="Space Invaders">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/brick-breaker.html">
+                        <img src="img/brick-breaker.jpg" alt="Brick Breaker">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/roulette/index.html">
+                        <img src="img/roulette.jpg" alt="Roulette">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/Snakegame.html">
+                        <img src="img/snake.jpg" alt="Snake">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/maze.html">
+                        <img src="img/maze.jpg" alt="Maze">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/slopeoffline.html">
+                        <img src="img/slope.jpg" alt="Slope Offline">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/HTML Tower Defence.html">
+                        <img src="img/towerdefense.png" alt="HTML Tower Defence">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/Connect the Pipes.html">
+                        <img src="img/coonectthepipes.png" alt="Connect the Pipes">
+                    </a>
+                </div>
+                <div class="game">
+                    <a href="games/tic-tac-toe.html">
+                        <img src="img/tictactoe.png" alt="Tic Tac Toe">
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Page footer -->
+    <footer>
+        © 2024 Aspenini.Fun - All rights reserved.
+    </footer>
+
+    <!-- JavaScript for tab functionality -->
+    <script>
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-options');
+            settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); // Save the theme preference
+        }
+
+        // Load the saved theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        changeTheme(savedTheme);
+    </script>
+
+    <!-- Service Worker registration for caching and offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>

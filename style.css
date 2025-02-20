@@ -1,0 +1,112 @@
+/* CSS Variables for Themes */
+:root {
+    --background-color: #1b2838;
+    --text-color: #c7d5e0;
+    --header-color: #171a21;
+    --button-hover-color: #66c0f4;
+    --button-active-color: #66c0f4;
+}
+
+[data-theme="dark"] {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-color: #1E1E1E;
+}
+
+[data-theme="blue"] {
+    --background-color: #dcefff;
+    --text-color: #002d5f;
+    --header-color: #003f88;
+}
+
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    background-color: var(--header-color);
+    color: white;
+    padding: 20px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Navigation bar styles */
+nav {
+    display: flex;
+    justify-content: center;
+    background-color: var(--header-color);
+    padding: 20px; /* Thicker panel */
+}
+
+nav button {
+    padding: 10px 15px; /* Decrease width */
+    font-size: 1.2em; /* Larger text */
+    font-weight: bold; /* Bolder text */
+    text-transform: uppercase; /* All capital letters */
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0 2px; /* Closer together */
+}
+
+nav button:hover, nav button.active {
+    background-color: var(--button-hover-color);
+    border-radius: 50px; /* More circular highlight area */
+    color: white;
+}
+
+/* Game List Styling */
+.game-list, .app-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-top: 2px solid var(--header-color);
+}
+
+.game, .app {
+    background-color: var(--header-color);
+    border: none;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    max-width: 200px; /* Limit the maximum width */
+    margin: auto; /* Center the game cards */
+}
+
+.game:hover, .app:hover {
+    transform: scale(1.05);
+}
+
+.game img, .app img {
+    width: 100%;
+    height: 300px; /* Ensures uniform height */
+    object-fit: cover; /* Ensures images do not stretch or skew */
+    border-radius: 15px;
+}
+
+footer {
+    margin-top: 50px;
+    padding: 20px;
+    background-color: var(--header-color);
+    color: white;
+    font-size: 1.2em;
+}
+
+/* Mobile-first Responsive Design */
+@media (min-width: 768px) {
+    .game-list, .app-list {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}

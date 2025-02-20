@@ -2,7 +2,7 @@
 
 A game hub for my HTML web games!
 
-![funky-icon](https://github.com/user-attachments/assets/bf316df7-99b9-4deb-ab45-5af783207e2f)
+![funky-icon](https://github.com/user-attachments/assets/10ef89c2-7453-4a29-b1ab-8df1327cd378)
 
 ## Overview
 

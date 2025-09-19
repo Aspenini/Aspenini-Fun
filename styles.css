@@ -774,3 +774,179 @@ body::before {
     font-size: 0.9rem;
     line-height: 1.5;
 }
+
+/* Game Overlay for Inline Games */
+.game-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.game-overlay-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.9));
+    border: 1px solid rgba(138, 119, 255, 0.3);
+    backdrop-filter: blur(15px);
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: rgba(138, 119, 255, 0.1);
+    border-bottom: 1px solid rgba(138, 119, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.back-to-hub-btn {
+    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    transform: translateZ(0);
+}
+
+.back-to-hub-btn:hover {
+    transform: scale(1.02) translateZ(0);
+    box-shadow: 0 6px 20px rgba(138, 119, 255, 0.4);
+}
+
+#gameOverlayTitle {
+    font-family: 'Orbitron', monospace;
+    color: #8a77ff;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(138, 119, 255, 0.3);
+    font-size: 1.5rem;
+}
+
+.game-overlay-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.game-overlay-btn {
+    background: rgba(138, 119, 255, 0.2);
+    border: 1px solid rgba(138, 119, 255, 0.3);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: #8a77ff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transform: translateZ(0);
+}
+
+.game-overlay-btn:hover {
+    background: rgba(138, 119, 255, 0.3);
+    transform: scale(1.05) translateZ(0);
+}
+
+.game-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#gameFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #000;
+    /* Ensure proper scaling */
+    transform-origin: top left;
+    /* Smooth loading */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#gameFrame.loaded {
+    opacity: 1;
+}
+
+/* Fullscreen mode */
+.game-overlay.fullscreen .game-overlay-content {
+    border: none;
+    border-radius: 0;
+}
+
+.game-overlay.fullscreen .game-header {
+    padding: 10px 20px;
+}
+
+/* Mobile optimizations for game overlay */
+@media (max-width: 768px) {
+    .game-header {
+        padding: 10px 15px;
+    }
+    
+    #gameOverlayTitle {
+        font-size: 1.2rem;
+    }
+    
+    .back-to-hub-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .game-overlay-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    /* Ensure iframe scales properly on mobile */
+    #gameFrame {
+        min-height: calc(100vh - 60px);
+    }
+}
+
+/* Ensure games scale properly within iframe */
+#gameFrame {
+    /* Prevent scrollbars */
+    overflow: hidden;
+    /* Ensure content fits */
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .game-header {
+        padding: 8px 12px;
+    }
+    
+    #gameOverlayTitle {
+        font-size: 1rem;
+    }
+    
+    .back-to-hub-btn {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}

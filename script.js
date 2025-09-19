@@ -161,14 +161,116 @@ class GameHub {
         // Use CSS class instead of direct style manipulation for better performance
         card.classList.add('clicked');
         
-        // Determine if game should open in new tab
-        const shouldOpenInNewTab = game.openInNewTab !== false; // Default to true if not specified
-        const target = shouldOpenInNewTab ? '_blank' : '_self';
+        // Check if game should open inline
+        if (game.inline) {
+            this.openInlineGame(game);
+        } else {
+            // Determine if game should open in new tab
+            const shouldOpenInNewTab = game.openInNewTab !== false; // Default to true if not specified
+            const target = shouldOpenInNewTab ? '_blank' : '_self';
+            
+            setTimeout(() => {
+                window.open(game.path, target);
+                card.classList.remove('clicked');
+            }, 100); // Reduced timeout for snappier feel
+        }
         
         setTimeout(() => {
-            window.open(game.path, target);
             card.classList.remove('clicked');
-        }, 100); // Reduced timeout for snappier feel
+        }, 100);
+    }
+
+    openInlineGame(game) {
+        const overlay = document.getElementById('gameOverlay');
+        const gameFrame = document.getElementById('gameFrame');
+        const gameTitle = document.getElementById('gameOverlayTitle');
+        
+        // Set game title
+        gameTitle.textContent = game.title;
+        
+        // Reset iframe state
+        gameFrame.classList.remove('loaded');
+        
+        // Set iframe source
+        gameFrame.src = game.path;
+        
+        // Show overlay
+        overlay.classList.add('active');
+        
+        // Hide main content
+        document.body.style.overflow = 'hidden';
+        
+        // Initialize account system bridge for the iframe
+        this.setupAccountBridge(game.id);
+    }
+
+    closeInlineGame() {
+        const overlay = document.getElementById('gameOverlay');
+        const gameFrame = document.getElementById('gameFrame');
+        
+        // Hide overlay
+        overlay.classList.remove('active');
+        overlay.classList.remove('fullscreen');
+        
+        // Clear iframe source to stop the game
+        gameFrame.src = '';
+        
+        // Restore main content
+        document.body.style.overflow = '';
+        
+        // Clean up account bridge
+        this.cleanupAccountBridge();
+    }
+
+    setupAccountBridge(gameId) {
+        // Create a bridge to pass account data to the iframe
+        this.currentGameId = gameId;
+        
+        // Listen for messages from the iframe
+        window.addEventListener('message', this.handleIframeMessage.bind(this));
+        
+        // Send account data to iframe when it loads
+        const gameFrame = document.getElementById('gameFrame');
+        gameFrame.onload = () => {
+            this.sendAccountDataToIframe();
+            // Show iframe after loading
+            gameFrame.classList.add('loaded');
+        };
+    }
+
+    cleanupAccountBridge() {
+        // Note: We can't remove specific bound functions, but that's okay for this use case
+        this.currentGameId = null;
+    }
+
+    handleIframeMessage(event) {
+        // Only accept messages from our game iframe
+        if (event.source !== document.getElementById('gameFrame').contentWindow) {
+            return;
+        }
+        
+        if (event.data.type === 'SAVE_GAME_DATA' && this.currentGameId) {
+            // Save game data to account system
+            window.accountSystem.setGameSave(this.currentGameId, event.data.data);
+        } else if (event.data.type === 'REQUEST_ACCOUNT_DATA') {
+            // Send account data to iframe
+            this.sendAccountDataToIframe();
+        }
+    }
+
+    sendAccountDataToIframe() {
+        const gameFrame = document.getElementById('gameFrame');
+        if (gameFrame.contentWindow && this.currentGameId) {
+            const accountData = {
+                username: window.accountSystem.currentUser,
+                saveData: window.accountSystem.getGameSave(this.currentGameId)
+            };
+            
+            gameFrame.contentWindow.postMessage({
+                type: 'ACCOUNT_DATA',
+                data: accountData
+            }, '*');
+        }
     }
 
     updateStats() {
@@ -207,9 +309,47 @@ class GameHub {
             if (e.key === 'Escape') {
                 // Close any modals or overlays
                 this.hideLoading();
+                // Close game overlay if open
+                if (document.getElementById('gameOverlay').classList.contains('active')) {
+                    this.closeInlineGame();
+                }
             }
         });
 
+        // Game overlay controls
+        document.getElementById('backToHubBtn').addEventListener('click', () => {
+            this.closeInlineGame();
+        });
+
+        document.getElementById('closeGameBtn').addEventListener('click', () => {
+            this.closeInlineGame();
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            this.toggleFullscreen();
+        });
+
+        // Close overlay when clicking outside the game area
+        document.getElementById('gameOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'gameOverlay') {
+                this.closeInlineGame();
+            }
+        });
+    }
+
+    toggleFullscreen() {
+        const overlay = document.getElementById('gameOverlay');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        if (overlay.classList.contains('fullscreen')) {
+            overlay.classList.remove('fullscreen');
+            fullscreenBtn.textContent = '⛶';
+            fullscreenBtn.title = 'Enter Fullscreen';
+        } else {
+            overlay.classList.add('fullscreen');
+            fullscreenBtn.textContent = '⛷';
+            fullscreenBtn.title = 'Exit Fullscreen';
+        }
     }
 
 
@@ -403,8 +543,17 @@ class AccountSystem {
             const decoded = this.decodeData(encodedData);
             const data = JSON.parse(decoded);
             
-            this.currentUser = data.username;
-            this.saveData = data.saveData || {};
+            // Handle both old and new formats
+            if (data.v === 1) {
+                // New compact format
+                this.currentUser = data.u;
+                this.saveData = data.s || {};
+            } else {
+                // Old format (backward compatibility)
+                this.currentUser = data.username;
+                this.saveData = data.saveData || {};
+            }
+            
             this.saveAccount();
             this.updateAccountDisplay();
             this.hideAccountPanel();
@@ -427,8 +576,18 @@ class AccountSystem {
             const decoded = this.decodeData(encodedData);
             const data = JSON.parse(decoded);
             
+            // Handle both old and new formats
+            let newSaveData = {};
+            if (data.v === 1) {
+                // New compact format
+                newSaveData = data.s || {};
+            } else {
+                // Old format
+                newSaveData = data.saveData || {};
+            }
+            
             // Merge save data
-            this.saveData = { ...this.saveData, ...data.saveData };
+            this.saveData = { ...this.saveData, ...newSaveData };
             this.saveAccount();
             
             alert('Save data updated successfully!');
@@ -439,26 +598,51 @@ class AccountSystem {
     }
     
     copyDataToClipboard() {
-        const data = {
-            username: this.currentUser,
-            saveData: this.saveData,
-            exportDate: new Date().toISOString()
+        // Create a more compact save data format
+        const compactData = {
+            u: this.currentUser, // username
+            s: this.saveData,    // saveData
+            v: 1                 // version
         };
         
-        const encoded = this.encodeData(JSON.stringify(data));
+        const encoded = this.encodeData(JSON.stringify(compactData));
         
-        navigator.clipboard.writeText(encoded).then(() => {
-            alert('Save data copied to clipboard!');
-        }).catch(() => {
-            // Fallback for older browsers
-            const textArea = document.createElement('textarea');
-            textArea.value = encoded;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert('Save data copied to clipboard!');
-        });
+        // Try modern clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(encoded).then(() => {
+                alert('Save data copied to clipboard!');
+            }).catch((err) => {
+                console.log('Clipboard API failed, using fallback:', err);
+                this.fallbackCopyToClipboard(encoded);
+            });
+        } else {
+            this.fallbackCopyToClipboard(encoded);
+        }
+    }
+    
+    fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                alert('Save data copied to clipboard!');
+            } else {
+                alert('Failed to copy to clipboard. Please select and copy manually:\n\n' + text);
+            }
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            alert('Failed to copy to clipboard. Please select and copy manually:\n\n' + text);
+        }
+        
+        document.body.removeChild(textArea);
     }
     
     logout() {

@@ -12,6 +12,9 @@ class Space2048 {
         this.gameWon = false;
         this.gameOver = false;
         
+        // Account system integration
+        this.accountData = null;
+        
         // Achievement tracking
         this.achievements = {
             firstMove: { unlocked: false, title: "First Steps", desc: "Make your first move", icon: "👶" },
@@ -24,6 +27,7 @@ class Space2048 {
         };
         
         this.loadAchievements();
+        this.setupAccountIntegration();
         this.init();
     }
     
@@ -527,6 +531,57 @@ class Space2048 {
     
     hideOverlay() {
         document.getElementById('gameOverlay').classList.add('hidden');
+    }
+    
+    setupAccountIntegration() {
+        // Listen for account data from the bridge
+        window.addEventListener('accountDataLoaded', (event) => {
+            this.accountData = event.detail;
+            this.loadFromAccount();
+        });
+        
+        // Try to load immediately if already available
+        setTimeout(() => {
+            this.loadFromAccount();
+        }, 100);
+        
+        // Auto-save to account every 5 seconds
+        setInterval(() => {
+            this.saveToAccount();
+        }, 5000);
+    }
+    
+    saveToAccount() {
+        const saveData = {
+            bestScore: this.bestScore,
+            achievements: this.achievements
+        };
+        
+        if (window.saveToAccount) {
+            window.saveToAccount(saveData);
+        }
+    }
+    
+    loadFromAccount() {
+        const accountSave = window.loadFromAccount();
+        if (accountSave) {
+            if (accountSave.bestScore && accountSave.bestScore > this.bestScore) {
+                this.bestScore = accountSave.bestScore;
+                localStorage.setItem('space2048Best', this.bestScore.toString());
+            }
+            
+            if (accountSave.achievements) {
+                Object.keys(this.achievements).forEach(key => {
+                    if (accountSave.achievements[key]) {
+                        this.achievements[key].unlocked = accountSave.achievements[key].unlocked;
+                    }
+                });
+                this.renderAchievements();
+            }
+            
+            this.updateDisplay();
+            console.log('Loaded Space 2048 save from account system');
+        }
     }
 }
 

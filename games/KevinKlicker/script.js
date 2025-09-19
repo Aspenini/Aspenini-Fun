@@ -134,25 +134,29 @@
 
   // Account system integration
   function loadFromAccount() {
-    if (window.accountSystem && window.accountSystem.currentUser) {
-      const accountSave = window.accountSystem.getGameSave('kevin-klicker');
-      if (accountSave) {
-        state = Object.assign({}, defaultState, accountSave);
-        console.log('Loaded Kevin Klicker save from account system');
-      }
+    const accountSave = window.loadFromAccount();
+    if (accountSave) {
+      state = Object.assign({}, defaultState, accountSave);
+      console.log('Loaded Kevin Klicker save from account system');
     }
   }
   
   function saveToAccount() {
-    if (window.accountSystem && window.accountSystem.currentUser) {
-      window.accountSystem.setGameSave('kevin-klicker', state);
-    }
+    window.saveToAccount(state);
   }
   
-  // Load from account on startup
+  // Load from account when account data is available
+  window.addEventListener('accountDataLoaded', () => {
+    loadFromAccount();
+    renderStats(); 
+    renderShop();
+  });
+  
+  // Also try to load immediately in case we're in standalone mode
   setTimeout(() => {
     loadFromAccount();
-    renderStats(); renderShop();
+    renderStats(); 
+    renderShop();
   }, 100);
 
   // First render

@@ -1,3 +1,30 @@
+/* Hide back button when running inline */
+body.inline-mode .back-button {
+    display: none !important;
+}
+
+/* Inline mode adjustments */
+body.inline-mode {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body.inline-mode .topbar {
+    padding: 10px 15px;
+}
+
+body.inline-mode .game-container {
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+/* Hide the title in the second bar when in inline mode */
+body.inline-mode .topbar h1 {
+    display: none;
+}
+
 /* Space Tetris - Matching Aspenini-Fun Hub Theme */
 * {
     margin: 0;

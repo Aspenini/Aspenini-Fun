@@ -67,6 +67,23 @@
         </div>
     </div>
 
+    <!-- Game Overlay for Inline Games -->
+    <div class="game-overlay" id="gameOverlay">
+        <div class="game-overlay-content">
+            <div class="game-header">
+                <button class="back-to-hub-btn" id="backToHubBtn">← Back to Hub</button>
+                <h2 id="gameOverlayTitle">Game</h2>
+                <div class="game-overlay-controls">
+                    <button class="game-overlay-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+                    <button class="game-overlay-btn" id="closeGameBtn" title="Close Game">×</button>
+                </div>
+            </div>
+            <div class="game-container">
+                <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Games data for local file:// protocol -->
     <script id="games-data" type="application/json">
     [
@@ -77,7 +94,8 @@
         "icon": "⛏️",
         "path": "games/EaglercraftX/EaglercraftX.html",
         "cover": "img/EaglercraftX.png",
-        "openInNewTab": true
+        "openInNewTab": false,
+        "inline": true
       },
       {
         "id": "kevin-klicker",
@@ -86,7 +104,8 @@
         "icon": "👨",
         "path": "games/KevinKlicker/index.html",
         "cover": "img/KevinKlicker.png",
-        "openInNewTab": false
+        "openInNewTab": false,
+        "inline": true
       },
       {
         "id": "space-tetris",
@@ -94,7 +113,8 @@
         "description": "Classic Tetris with a cosmic twist! Arrange falling blocks to clear lines in this space-themed puzzle game with glowing effects.",
         "icon": "🧩",
         "path": "games/SpaceTetris/index.html",
-        "openInNewTab": false
+        "openInNewTab": false,
+        "inline": true
       },
       {
         "id": "space-2048",
@@ -102,7 +122,8 @@
         "description": "Slide numbered tiles to combine them and reach 2048! A space-themed version of the addictive puzzle game with achievements.",
         "icon": "🔢",
         "path": "games/Space2048/index.html",
-        "openInNewTab": false
+        "openInNewTab": false,
+        "inline": true
       },
       {
         "id": "slope",
@@ -110,7 +131,8 @@
         "description": "Control a ball rolling down a steep slope! Avoid obstacles and see how far you can go in this fast-paced endless runner.",
         "icon": "⚽",
         "path": "games/Slope/index.html",
-        "openInNewTab": true
+        "openInNewTab": false,
+        "inline": true
       },
       {
         "id": "color-memory",
@@ -118,7 +140,8 @@
         "description": "Test your memory by remembering the sequence of colors. A fun brain training game that gets progressively more challenging!",
         "icon": "🧠",
         "path": "games/ColorMemory/index.html",
-        "openInNewTab": false
+        "openInNewTab": false,
+        "inline": true
       }
     ]
     </script>

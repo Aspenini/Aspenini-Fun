@@ -26,6 +26,9 @@ class SpaceTetris {
         // Load best score
         this.bestScore = parseInt(localStorage.getItem('spaceTetrisBest') || '0');
         
+        // Account system integration
+        this.accountData = null;
+        
         // Tetris pieces (tetrominoes)
         this.pieces = {
             'I': {
@@ -82,6 +85,7 @@ class SpaceTetris {
     init() {
         this.initBoard();
         this.bindEvents();
+        this.setupAccountIntegration();
         this.updateDisplay();
         this.showOverlay('Space Tetris', 'Press SPACE or click START to begin your cosmic puzzle adventure!');
     }
@@ -451,6 +455,47 @@ class SpaceTetris {
     
     hideOverlay() {
         document.getElementById('gameOverlay').classList.add('hidden');
+    }
+    
+    setupAccountIntegration() {
+        // Listen for account data from the bridge
+        window.addEventListener('accountDataLoaded', (event) => {
+            this.accountData = event.detail;
+            this.loadFromAccount();
+        });
+        
+        // Try to load immediately if already available
+        setTimeout(() => {
+            this.loadFromAccount();
+        }, 100);
+        
+        // Auto-save to account every 10 seconds
+        setInterval(() => {
+            this.saveToAccount();
+        }, 10000);
+    }
+    
+    saveToAccount() {
+        const saveData = {
+            bestScore: this.bestScore
+        };
+        
+        if (window.saveToAccount) {
+            window.saveToAccount(saveData);
+        }
+    }
+    
+    loadFromAccount() {
+        const accountSave = window.loadFromAccount();
+        if (accountSave) {
+            if (accountSave.bestScore && accountSave.bestScore > this.bestScore) {
+                this.bestScore = accountSave.bestScore;
+                localStorage.setItem('spaceTetrisBest', this.bestScore.toString());
+                this.updateDisplay();
+            }
+            
+            console.log('Loaded Space Tetris save from account system');
+        }
     }
 }
 

@@ -1,3 +1,34 @@
+/* Hide back button when running inline */
+body.inline-mode .back-button {
+    display: none !important;
+}
+
+/* Inline mode adjustments */
+body.inline-mode {
+    /* Remove fixed positioning that might cause issues in iframe */
+    position: relative;
+    /* Ensure proper scaling */
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body.inline-mode .topbar {
+    /* Reduce padding in inline mode */
+    padding: 10px 15px;
+}
+
+body.inline-mode .grid {
+    /* Adjust grid layout for iframe */
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+/* Hide the title in the second bar when in inline mode */
+body.inline-mode .topbar h1 {
+    display: none;
+}
+
 /* Kevin Klicker styles: space-themed to match Aspenini-Fun hub */
 :root{
   --bg:#0f0f23;

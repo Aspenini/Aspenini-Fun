@@ -10,8 +10,16 @@
 <body>
     <div class="container">
         <header class="hero">
-            <h1 class="logo">Aspenini-Fun</h1>
-            <p class="tagline">Your Gateway to Amazing Games</p>
+            <div class="hero-content">
+                <h1 class="logo">Aspenini-Fun</h1>
+                <p class="tagline">Your Gateway to Amazing Games</p>
+            </div>
+            <div class="hero-account">
+                <button id="accountBtn" class="account-button" title="Account & Save Data">
+                    <span class="account-icon">👤</span>
+                    <span class="account-name" id="accountName">Guest</span>
+                </button>
+            </div>
         </header>
 
         <main class="main-content">
@@ -45,6 +53,20 @@
         <p>Loading games...</p>
     </div>
 
+    <!-- Account Panel -->
+    <div class="account-panel" id="accountPanel">
+        <div class="account-panel-content">
+            <div class="account-header">
+                <h3>Account & Save Data</h3>
+                <button class="close-btn" id="closeAccountPanel">×</button>
+            </div>
+            
+            <div class="account-body" id="accountBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <!-- Games data for local file:// protocol -->
     <script id="games-data" type="application/json">
     [
@@ -73,6 +95,22 @@
         "icon": "🧩",
         "path": "games/SpaceTetris/index.html",
         "openInNewTab": false
+      },
+      {
+        "id": "space-2048",
+        "title": "Space 2048",
+        "description": "Slide numbered tiles to combine them and reach 2048! A space-themed version of the addictive puzzle game with achievements.",
+        "icon": "🔢",
+        "path": "games/Space2048/index.html",
+        "openInNewTab": false
+      },
+      {
+        "id": "slope",
+        "title": "Slope",
+        "description": "Control a ball rolling down a steep slope! Avoid obstacles and see how far you can go in this fast-paced endless runner.",
+        "icon": "⚽",
+        "path": "games/Slope/index.html",
+        "openInNewTab": true
       },
       {
         "id": "color-memory",

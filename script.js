@@ -210,54 +210,10 @@ class GameHub {
             }
         });
 
-        // Add search functionality
-        this.addSearchFunctionality();
-    }
-
-    addSearchFunctionality() {
-        // Create search input if it doesn't exist
-        const existingSearch = document.querySelector('.search-container');
-        if (existingSearch) return;
-
-        const searchContainer = document.createElement('div');
-        searchContainer.className = 'search-container';
-        searchContainer.innerHTML = `
-            <input type="text" id="gameSearch" placeholder="Search games..." class="search-input">
-        `;
-
-        const gamesSection = document.querySelector('.games-section');
-        gamesSection.insertBefore(searchContainer, this.gamesGrid);
-
-        // Add search functionality
-        const searchInput = document.getElementById('gameSearch');
-        searchInput.addEventListener('input', (e) => {
-            this.filterGames(e.target.value);
-        });
     }
 
 
-    filterGames(searchTerm) {
-        // Debounce search for better performance
-        clearTimeout(this.searchTimeout);
-        this.searchTimeout = setTimeout(() => {
-            const cards = document.querySelectorAll('.game-card');
-            const term = searchTerm.toLowerCase();
 
-            // Use requestAnimationFrame for smoother filtering
-            requestAnimationFrame(() => {
-                cards.forEach(card => {
-                    const title = card.querySelector('.game-title').textContent.toLowerCase();
-                    const description = card.querySelector('.game-description').textContent.toLowerCase();
-                    
-                    if (title.includes(term) || description.includes(term)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        }, 150); // Debounce delay
-    }
 
 
     // Method to add a new game dynamically
@@ -296,9 +252,288 @@ class GameHub {
     }
 }
 
-// Initialize the game hub when the DOM is loaded
+// Account System
+class AccountSystem {
+    constructor() {
+        this.currentUser = null;
+        this.saveData = {};
+        this.init();
+    }
+    
+    init() {
+        this.loadAccount();
+        this.bindEvents();
+        this.updateAccountDisplay();
+    }
+    
+    bindEvents() {
+        document.getElementById('accountBtn').addEventListener('click', () => this.showAccountPanel());
+        document.getElementById('closeAccountPanel').addEventListener('click', () => this.hideAccountPanel());
+        
+        // Close panel when clicking outside
+        document.getElementById('accountPanel').addEventListener('click', (e) => {
+            if (e.target.id === 'accountPanel') {
+                this.hideAccountPanel();
+            }
+        });
+    }
+    
+    showAccountPanel() {
+        const panel = document.getElementById('accountPanel');
+        const body = document.getElementById('accountBody');
+        
+        if (this.currentUser) {
+            this.showLoggedInView(body);
+        } else {
+            this.showLoginView(body);
+        }
+        
+        panel.classList.add('active');
+    }
+    
+    hideAccountPanel() {
+        document.getElementById('accountPanel').classList.remove('active');
+    }
+    
+    showLoginView(container) {
+        container.innerHTML = `
+            <div class="account-form">
+                <p style="color: #b8b8ff; text-align: center; margin-bottom: 20px;">
+                    Create an account to save your progress across all games!
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">Choose a username:</label>
+                    <input type="text" class="form-input" id="usernameInput" placeholder="@username" maxlength="20">
+                </div>
+                
+                <div class="account-actions">
+                    <button class="account-btn" id="createAccountBtn">Create Account</button>
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0; color: #b8b8ff;">- OR -</div>
+                
+                <div class="account-actions">
+                    <button class="account-btn secondary" id="importDataBtn">Import Save Data</button>
+                </div>
+                
+                <textarea class="form-input" id="importDataInput" placeholder="Paste your encoded save data here..." style="display: none; height: 100px; resize: vertical;"></textarea>
+            </div>
+        `;
+        
+        document.getElementById('createAccountBtn').addEventListener('click', () => this.createAccount());
+        document.getElementById('importDataBtn').addEventListener('click', () => this.showImportInput());
+    }
+    
+    showLoggedInView(container) {
+        const stats = this.getSaveDataStats();
+        
+        container.innerHTML = `
+            <div class="account-info">
+                <div class="username-display">@${this.currentUser}</div>
+                <div class="save-stats">
+                    ${stats}
+                </div>
+            </div>
+            
+            <div class="account-actions">
+                <button class="account-btn" id="copyDataBtn">Copy Save Data</button>
+                <button class="account-btn secondary" id="logoutBtn">Logout</button>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Import/Update Save Data:</label>
+                    <textarea class="form-input" id="updateDataInput" placeholder="Paste encoded save data to update..." style="height: 80px; resize: vertical;"></textarea>
+                </div>
+                <div class="account-actions">
+                    <button class="account-btn secondary" id="updateDataBtn">Update Data</button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('copyDataBtn').addEventListener('click', () => this.copyDataToClipboard());
+        document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+        document.getElementById('updateDataBtn').addEventListener('click', () => this.updateSaveData());
+    }
+    
+    showImportInput() {
+        const importInput = document.getElementById('importDataInput');
+        const importBtn = document.getElementById('importDataBtn');
+        
+        if (importInput.style.display === 'none') {
+            importInput.style.display = 'block';
+            importBtn.textContent = 'Import Data';
+            importBtn.onclick = () => this.importSaveData();
+        }
+    }
+    
+    createAccount() {
+        const username = document.getElementById('usernameInput').value.trim();
+        
+        if (!username) {
+            alert('Please enter a username!');
+            return;
+        }
+        
+        // Clean username (remove @ if added)
+        const cleanUsername = username.replace(/^@/, '');
+        
+        if (cleanUsername.length < 3) {
+            alert('Username must be at least 3 characters!');
+            return;
+        }
+        
+        this.currentUser = cleanUsername;
+        this.saveData = {};
+        this.saveAccount();
+        this.updateAccountDisplay();
+        this.hideAccountPanel();
+    }
+    
+    importSaveData() {
+        const encodedData = document.getElementById('importDataInput').value.trim();
+        
+        if (!encodedData) {
+            alert('Please paste your save data!');
+            return;
+        }
+        
+        try {
+            const decoded = this.decodeData(encodedData);
+            const data = JSON.parse(decoded);
+            
+            this.currentUser = data.username;
+            this.saveData = data.saveData || {};
+            this.saveAccount();
+            this.updateAccountDisplay();
+            this.hideAccountPanel();
+            
+            alert('Save data imported successfully!');
+        } catch (error) {
+            alert('Invalid save data format!');
+        }
+    }
+    
+    updateSaveData() {
+        const encodedData = document.getElementById('updateDataInput').value.trim();
+        
+        if (!encodedData) {
+            alert('Please paste save data to update!');
+            return;
+        }
+        
+        try {
+            const decoded = this.decodeData(encodedData);
+            const data = JSON.parse(decoded);
+            
+            // Merge save data
+            this.saveData = { ...this.saveData, ...data.saveData };
+            this.saveAccount();
+            
+            alert('Save data updated successfully!');
+            this.showAccountPanel(); // Refresh the panel
+        } catch (error) {
+            alert('Invalid save data format!');
+        }
+    }
+    
+    copyDataToClipboard() {
+        const data = {
+            username: this.currentUser,
+            saveData: this.saveData,
+            exportDate: new Date().toISOString()
+        };
+        
+        const encoded = this.encodeData(JSON.stringify(data));
+        
+        navigator.clipboard.writeText(encoded).then(() => {
+            alert('Save data copied to clipboard!');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = encoded;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Save data copied to clipboard!');
+        });
+    }
+    
+    logout() {
+        if (confirm('Are you sure you want to logout? Your save data will remain stored locally.')) {
+            this.currentUser = null;
+            this.saveData = {};
+            localStorage.removeItem('aspeniniAccount');
+            this.updateAccountDisplay();
+            this.hideAccountPanel();
+        }
+    }
+    
+    // Simple encoding to prevent easy cheating (Base64 + simple scramble)
+    encodeData(data) {
+        const scrambled = data.split('').reverse().join('');
+        return btoa(scrambled).split('').reverse().join('');
+    }
+    
+    decodeData(encoded) {
+        const unscrambled = encoded.split('').reverse().join('');
+        return atob(unscrambled).split('').reverse().join('');
+    }
+    
+    saveAccount() {
+        const accountData = {
+            username: this.currentUser,
+            saveData: this.saveData
+        };
+        localStorage.setItem('aspeniniAccount', JSON.stringify(accountData));
+    }
+    
+    loadAccount() {
+        const saved = localStorage.getItem('aspeniniAccount');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                this.currentUser = data.username;
+                this.saveData = data.saveData || {};
+            } catch (error) {
+                console.log('Error loading account:', error);
+            }
+        }
+    }
+    
+    updateAccountDisplay() {
+        const accountName = document.getElementById('accountName');
+        accountName.textContent = this.currentUser ? `@${this.currentUser}` : 'Guest';
+    }
+    
+    getSaveDataStats() {
+        const gameCount = Object.keys(this.saveData).length;
+        const totalSize = JSON.stringify(this.saveData).length;
+        
+        return `
+            Games with save data: ${gameCount}
+            Total save size: ${totalSize} characters
+            Account created: ${this.currentUser ? 'Yes' : 'No'}
+        `;
+    }
+    
+    // Methods for games to use
+    getGameSave(gameId) {
+        return this.saveData[gameId] || null;
+    }
+    
+    setGameSave(gameId, data) {
+        this.saveData[gameId] = data;
+        this.saveAccount();
+    }
+}
+
+// Initialize the game hub and account system when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.gameHub = new GameHub();
+    window.accountSystem = new AccountSystem();
 });
 
 // Add some fun easter eggs

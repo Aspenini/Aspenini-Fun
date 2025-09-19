@@ -118,8 +118,11 @@
   }
   requestAnimationFrame(loop);
 
-  // Auto-save
-  setInterval(() => save(state), 3000);
+  // Auto-save (both local and account)
+  setInterval(() => {
+    save(state);
+    saveToAccount();
+  }, 3000);
 
   // Reset
   resetBtn.addEventListener('click', () => {
@@ -129,31 +132,28 @@
     renderStats(); renderShop();
   });
 
-  // Export / Import
-  exportBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const data = JSON.stringify(state);
-    const blob = new Blob([data], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'kevin-klicker-save.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-  importFile.addEventListener('change', async (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    try {
-      const text = await f.text();
-      const incoming = JSON.parse(text);
-      state = Object.assign({}, defaultState, incoming);
-      save(state);
-      renderStats(); renderShop();
-      alert('Save imported!');
-    } catch {
-      alert('Invalid save file.');
+  // Account system integration
+  function loadFromAccount() {
+    if (window.accountSystem && window.accountSystem.currentUser) {
+      const accountSave = window.accountSystem.getGameSave('kevin-klicker');
+      if (accountSave) {
+        state = Object.assign({}, defaultState, accountSave);
+        console.log('Loaded Kevin Klicker save from account system');
+      }
     }
-  });
+  }
+  
+  function saveToAccount() {
+    if (window.accountSystem && window.accountSystem.currentUser) {
+      window.accountSystem.setGameSave('kevin-klicker', state);
+    }
+  }
+  
+  // Load from account on startup
+  setTimeout(() => {
+    loadFromAccount();
+    renderStats(); renderShop();
+  }, 100);
 
   // First render
   renderStats(); renderShop();

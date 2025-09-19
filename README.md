@@ -7,7 +7,7 @@ A modern, responsive static HTML game hub that serves as a central portal for yo
 - **Modern UI**: Beautiful gradient design with glassmorphism effects
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
 - **Game Discovery**: Automatically discovers games in the games folder
-- **Search**: Find games quickly with search functionality
+- **Simple Navigation**: Clean interface focused on your games
 - **Game Management**: Easy configuration through JSON files
 - **Performance**: Lightweight and optimized for Chromebooks and low-end devices
 - **Easter Eggs**: Hidden surprises for curious users 🎉

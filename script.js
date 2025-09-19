@@ -5,6 +5,7 @@ class GameHub {
         this.gamesGrid = document.getElementById('gamesGrid');
         this.gameCount = document.getElementById('gameCount');
         this.loadingOverlay = document.getElementById('loadingOverlay');
+        this.currentGame = null;
         
         this.init();
     }
@@ -20,6 +21,7 @@ class GameHub {
                 this.updateStats();
                 this.hideLoading();
                 this.addEventListeners();
+                this.initRouting();
             });
         } else {
             // Fallback for browsers that don't support requestIdleCallback
@@ -29,7 +31,79 @@ class GameHub {
                 this.updateStats();
                 this.hideLoading();
                 this.addEventListeners();
+                this.initRouting();
             }, 100);
+        }
+    }
+
+    // Hash-based routing methods
+    initRouting() {
+        // Handle initial hash
+        this.handleHashChange();
+        
+        // Listen for hash changes
+        window.addEventListener('hashchange', () => {
+            this.handleHashChange();
+        });
+        
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', () => {
+            this.handleHashChange();
+        });
+    }
+
+    handleHashChange() {
+        const hash = window.location.hash.substring(1); // Remove the #
+        
+        if (!hash) {
+            // No hash, show hub
+            this.showHub();
+            return;
+        }
+        
+        // Find game by ID
+        const game = this.games.find(g => g.id === hash);
+        if (game) {
+            this.openGameFromHash(game);
+        } else {
+            // Invalid hash, redirect to hub
+            console.warn(`Game with ID "${hash}" not found`);
+            this.showHub();
+        }
+    }
+
+    showHub() {
+        // Close any open game overlay
+        this.closeInlineGame();
+        
+        // Update URL to hub
+        if (window.location.hash !== '') {
+            window.history.replaceState(null, '', window.location.pathname);
+        }
+        
+        // Show the main hub content
+        document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('gameOverlay').classList.remove('active');
+    }
+
+    openGameFromHash(game) {
+        this.currentGame = game;
+        
+        // Update URL with game hash
+        if (window.location.hash !== `#${game.id}`) {
+            window.history.replaceState(null, '', `#${game.id}`);
+        }
+        
+        // Hide main content and show game
+        document.getElementById('mainContent').style.display = 'none';
+        
+        if (game.inline) {
+            this.openInlineGame(game);
+        } else {
+            // For non-inline games, still open in new tab but update URL
+            const shouldOpenInNewTab = game.openInNewTab !== false;
+            const target = shouldOpenInNewTab ? '_blank' : '_self';
+            window.open(game.path, target);
         }
     }
 
@@ -129,7 +203,7 @@ class GameHub {
             ${coverImage}
             <div class="game-info">
                 <p class="game-description">${game.description}</p>
-                <a href="${game.path}" class="play-button" target="${target}">Play Now</a>
+                <button class="play-button">Play Now</button>
             </div>
         `;
 
@@ -138,6 +212,13 @@ class GameHub {
             if (!e.target.classList.contains('play-button')) {
                 this.openGame(game);
             }
+        });
+
+        // Add click event to the play button
+        const playButton = card.querySelector('.play-button');
+        playButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent card click event
+            this.openGame(game);
         });
 
         return card;
@@ -161,19 +242,8 @@ class GameHub {
         // Use CSS class instead of direct style manipulation for better performance
         card.classList.add('clicked');
         
-        // Check if game should open inline
-        if (game.inline) {
-            this.openInlineGame(game);
-        } else {
-            // Determine if game should open in new tab
-            const shouldOpenInNewTab = game.openInNewTab !== false; // Default to true if not specified
-            const target = shouldOpenInNewTab ? '_blank' : '_self';
-            
-            setTimeout(() => {
-                window.open(game.path, target);
-                card.classList.remove('clicked');
-            }, 100); // Reduced timeout for snappier feel
-        }
+        // Update URL with hash routing
+        window.location.hash = `#${game.id}`;
         
         setTimeout(() => {
             card.classList.remove('clicked');
@@ -311,18 +381,18 @@ class GameHub {
                 this.hideLoading();
                 // Close game overlay if open
                 if (document.getElementById('gameOverlay').classList.contains('active')) {
-                    this.closeInlineGame();
+                    this.showHub();
                 }
             }
         });
 
         // Game overlay controls
         document.getElementById('backToHubBtn').addEventListener('click', () => {
-            this.closeInlineGame();
+            this.showHub();
         });
 
         document.getElementById('closeGameBtn').addEventListener('click', () => {
-            this.closeInlineGame();
+            this.showHub();
         });
 
         document.getElementById('fullscreenBtn').addEventListener('click', () => {
@@ -332,7 +402,7 @@ class GameHub {
         // Close overlay when clicking outside the game area
         document.getElementById('gameOverlay').addEventListener('click', (e) => {
             if (e.target.id === 'gameOverlay') {
-                this.closeInlineGame();
+                this.showHub();
             }
         });
     }
@@ -454,10 +524,10 @@ class AccountSystem {
                 <div style="text-align: center; margin: 20px 0; color: #b8b8ff;">- OR -</div>
                 
                 <div class="account-actions">
-                    <button class="account-btn secondary" id="importDataBtn">Import Save Data</button>
+                    <button class="account-btn secondary" id="importDataBtn">Import Account (Replace All Data)</button>
                 </div>
                 
-                <textarea class="form-input" id="importDataInput" placeholder="Paste your encoded save data here..." style="display: none; height: 100px; resize: vertical;"></textarea>
+                <textarea class="form-input" id="importDataInput" placeholder="Paste account data here - WARNING: This will replace ALL current save data!" style="display: none; height: 100px; resize: vertical;"></textarea>
             </div>
         `;
         
@@ -481,20 +551,10 @@ class AccountSystem {
                 <button class="account-btn secondary" id="logoutBtn">Logout</button>
             </div>
             
-            <div style="margin-top: 20px;">
-                <div class="form-group">
-                    <label class="form-label">Import/Update Save Data:</label>
-                    <textarea class="form-input" id="updateDataInput" placeholder="Paste encoded save data to update..." style="height: 80px; resize: vertical;"></textarea>
-                </div>
-                <div class="account-actions">
-                    <button class="account-btn secondary" id="updateDataBtn">Update Data</button>
-                </div>
-            </div>
         `;
         
         document.getElementById('copyDataBtn').addEventListener('click', () => this.copyDataToClipboard());
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
-        document.getElementById('updateDataBtn').addEventListener('click', () => this.updateSaveData());
     }
     
     showImportInput() {
@@ -503,7 +563,7 @@ class AccountSystem {
         
         if (importInput.style.display === 'none') {
             importInput.style.display = 'block';
-            importBtn.textContent = 'Import Data';
+            importBtn.textContent = 'Import Account (Replace All)';
             importBtn.onclick = () => this.importSaveData();
         }
     }
@@ -543,59 +603,27 @@ class AccountSystem {
             const decoded = this.decodeData(encodedData);
             const data = JSON.parse(decoded);
             
-            // Handle both old and new formats
+            // COMPLETELY REPLACE current save data (per account)
             if (data.v === 1) {
                 // New compact format
                 this.currentUser = data.u;
-                this.saveData = data.s || {};
+                this.saveData = data.s || {}; // Complete replacement
             } else {
                 // Old format (backward compatibility)
                 this.currentUser = data.username;
-                this.saveData = data.saveData || {};
+                this.saveData = data.saveData || {}; // Complete replacement
             }
             
             this.saveAccount();
             this.updateAccountDisplay();
             this.hideAccountPanel();
             
-            alert('Save data imported successfully!');
+            alert('Account imported successfully! All previous save data has been replaced.');
         } catch (error) {
             alert('Invalid save data format!');
         }
     }
     
-    updateSaveData() {
-        const encodedData = document.getElementById('updateDataInput').value.trim();
-        
-        if (!encodedData) {
-            alert('Please paste save data to update!');
-            return;
-        }
-        
-        try {
-            const decoded = this.decodeData(encodedData);
-            const data = JSON.parse(decoded);
-            
-            // Handle both old and new formats
-            let newSaveData = {};
-            if (data.v === 1) {
-                // New compact format
-                newSaveData = data.s || {};
-            } else {
-                // Old format
-                newSaveData = data.saveData || {};
-            }
-            
-            // Merge save data
-            this.saveData = { ...this.saveData, ...newSaveData };
-            this.saveAccount();
-            
-            alert('Save data updated successfully!');
-            this.showAccountPanel(); // Refresh the panel
-        } catch (error) {
-            alert('Invalid save data format!');
-        }
-    }
     
     copyDataToClipboard() {
         // Create a more compact save data format
@@ -646,7 +674,7 @@ class AccountSystem {
     }
     
     logout() {
-        if (confirm('Are you sure you want to logout? Your save data will remain stored locally.')) {
+        if (confirm('Are you sure you want to logout? This will ERASE ALL current save data and you will lose all progress!')) {
             this.currentUser = null;
             this.saveData = {};
             localStorage.removeItem('aspeniniAccount');

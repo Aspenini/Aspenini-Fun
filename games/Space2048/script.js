@@ -11,6 +11,7 @@ class Space2048 {
         this.gameStarted = false;
         this.gameWon = false;
         this.gameOver = false;
+        this.animating = false;
         
         // Account system integration
         this.accountData = null;
@@ -143,7 +144,7 @@ class Space2048 {
     }
     
     move(direction) {
-        if (!this.gameStarted || this.gameOver) return;
+        if (!this.gameStarted || this.gameOver || this.animating) return;
         
         // Save current state for undo
         this.previousBoard = this.board.map(row => [...row]);
@@ -163,12 +164,18 @@ class Space2048 {
         }
         
         if (moved) {
-            this.board = newBoard;
+            this.animating = true;
             this.moves++;
-            this.addRandomTile();
-            this.updateDisplay();
-            this.renderBoard();
-            this.checkAchievements();
+            
+            // Animate the move
+            this.animateMove(this.board, newBoard, direction, () => {
+                this.board = newBoard;
+                this.addRandomTile();
+                this.updateDisplay();
+                this.renderBoard();
+                this.checkAchievements();
+                this.animating = false;
+            });
             
             if (this.isGameWon() && !this.gameWon) {
                 this.gameWon = true;
@@ -371,19 +378,38 @@ class Space2048 {
     
     renderBoard() {
         const gameBoard = document.getElementById('gameBoard');
-        gameBoard.innerHTML = '';
         
+        // Initialize board container if not exists
+        if (!gameBoard.querySelector('.tile-container')) {
+            gameBoard.innerHTML = `
+                <div class="grid-container">
+                    ${Array(16).fill('<div class="grid-cell"></div>').join('')}
+                </div>
+                <div class="tile-container"></div>
+            `;
+        }
+        
+        const tileContainer = gameBoard.querySelector('.tile-container');
+        
+        // Clear existing tiles
+        tileContainer.innerHTML = '';
+        
+        // Create tiles with positions
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
-                const tile = document.createElement('div');
-                tile.className = 'tile';
-                
                 const value = this.board[i][j];
-                if (value === 0) {
-                    tile.classList.add('empty');
-                } else {
+                if (value !== 0) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
                     tile.textContent = value;
                     tile.setAttribute('data-value', value);
+                    tile.setAttribute('data-row', i);
+                    tile.setAttribute('data-col', j);
+                    
+                    // Position tile using CSS transforms
+                    const x = j * 120 + (j * 15); // tile width + gap
+                    const y = i * 120 + (i * 15); // tile height + gap
+                    tile.style.transform = `translate(${x}px, ${y}px)`;
                     
                     // Add animation class for new tiles
                     if (!this.previousBoard.length || this.previousBoard[i][j] !== value) {
@@ -393,14 +419,108 @@ class Space2048 {
                             tile.classList.add('merged');
                         }
                     }
+                    
+                    tileContainer.appendChild(tile);
                 }
-                
-                gameBoard.appendChild(tile);
             }
         }
         
         // Update undo button state
         document.getElementById('undoBtn').disabled = this.previousBoard.length === 0;
+    }
+
+    animateMove(oldBoard, newBoard, direction, callback) {
+        const tileContainer = document.querySelector('.tile-container');
+        const animationDuration = 150;
+        
+        // Create tiles for animation
+        const animatingTiles = [];
+        
+        // Find tiles that moved
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                const oldValue = oldBoard[i][j];
+                if (oldValue !== 0) {
+                    // Find where this tile ended up
+                    const newPos = this.findTileDestination(oldBoard, newBoard, i, j, direction);
+                    if (newPos && (newPos.row !== i || newPos.col !== j)) {
+                        // Create animated tile
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.textContent = oldValue;
+                        tile.setAttribute('data-value', oldValue);
+                        
+                        // Start position
+                        const startX = j * 135; // 120px width + 15px gap
+                        const startY = i * 135;
+                        tile.style.transform = `translate(${startX}px, ${startY}px)`;
+                        
+                        tileContainer.appendChild(tile);
+                        animatingTiles.push({
+                            element: tile,
+                            startX,
+                            startY,
+                            endX: newPos.col * 135,
+                            endY: newPos.row * 135
+                        });
+                    }
+                }
+            }
+        }
+        
+        // Animate tiles
+        if (animatingTiles.length > 0) {
+            // Start animation
+            requestAnimationFrame(() => {
+                animatingTiles.forEach(tile => {
+                    tile.element.style.transform = `translate(${tile.endX}px, ${tile.endY}px)`;
+                });
+            });
+            
+            // Clean up after animation
+            setTimeout(() => {
+                animatingTiles.forEach(tile => {
+                    tile.element.remove();
+                });
+                callback();
+            }, animationDuration);
+        } else {
+            callback();
+        }
+    }
+
+    findTileDestination(oldBoard, newBoard, oldRow, oldCol, direction) {
+        const value = oldBoard[oldRow][oldCol];
+        
+        // Find where this tile value appears in the new board
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (newBoard[i][j] === value) {
+                    // Check if this is the correct destination based on direction
+                    if (this.isValidDestination(oldRow, oldCol, i, j, direction)) {
+                        // Mark as used to avoid duplicate matching
+                        newBoard[i][j] = -1;
+                        return { row: i, col: j };
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    isValidDestination(oldRow, oldCol, newRow, newCol, direction) {
+        switch (direction) {
+            case 'left':
+                return oldRow === newRow && newCol <= oldCol;
+            case 'right':
+                return oldRow === newRow && newCol >= oldCol;
+            case 'up':
+                return oldCol === newCol && newRow <= oldRow;
+            case 'down':
+                return oldCol === newCol && newRow >= oldRow;
+            default:
+                return false;
+        }
     }
     
     updateDisplay() {

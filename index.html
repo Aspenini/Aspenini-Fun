@@ -9,42 +9,44 @@
 </head>
 <body>
     <div class="container">
-        <header class="hero">
-            <div class="hero-content">
-                <h1 class="logo">Aspenini-Fun</h1>
-                <p class="tagline">Your Gateway to Amazing Games</p>
-            </div>
-            <div class="hero-account">
-                <button id="accountBtn" class="account-button" title="Account & Save Data">
-                    <span class="account-icon">👤</span>
-                    <span class="account-name" id="accountName">Guest</span>
-                </button>
-            </div>
-        </header>
-
-        <main class="main-content">
-            <section class="games-section">
-                <h2 class="section-title">Available Games</h2>
-                <div class="games-grid" id="gamesGrid">
-                    <!-- Games will be dynamically loaded here -->
+        <div id="mainContent">
+            <header class="hero">
+                <div class="hero-content">
+                    <h1 class="logo">Aspenini-Fun</h1>
+                    <p class="tagline">Your Gateway to Amazing Games</p>
                 </div>
-            </section>
-
-            <section class="stats-section">
-                <div class="stat-card">
-                    <h3 class="stat-number" id="gameCount">0</h3>
-                    <p class="stat-label">Games Available</p>
+                <div class="hero-account">
+                    <button id="accountBtn" class="account-button" title="Account & Save Data">
+                        <span class="account-icon">👤</span>
+                        <span class="account-name" id="accountName">Guest</span>
+                    </button>
                 </div>
-                <div class="stat-card">
-                    <h3 class="stat-number">∞</h3>
-                    <p class="stat-label">Fun Guaranteed</p>
-                </div>
-            </section>
-        </main>
+            </header>
 
-        <footer class="footer">
-            <p>&copy; 2025 Aspenini-Fun. Ready to play?</p>
-        </footer>
+            <main class="main-content">
+                <section class="games-section">
+                    <h2 class="section-title">Available Games</h2>
+                    <div class="games-grid" id="gamesGrid">
+                        <!-- Games will be dynamically loaded here -->
+                    </div>
+                </section>
+
+                <section class="stats-section">
+                    <div class="stat-card">
+                        <h3 class="stat-number" id="gameCount">0</h3>
+                        <p class="stat-label">Games Available</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 class="stat-number">∞</h3>
+                        <p class="stat-label">Fun Guaranteed</p>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <p>&copy; 2025 Aspenini-Fun. Ready to play?</p>
+            </footer>
+        </div>
     </div>
 
     <!-- Loading overlay -->

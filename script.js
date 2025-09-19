@@ -525,14 +525,18 @@ class AccountSystem {
                 
                 <div class="account-actions">
                     <button class="account-btn secondary" id="importDataBtn">Import Account (Replace All Data)</button>
+                    <button class="account-btn secondary" id="importFileBtn">Import from .afs File</button>
                 </div>
                 
                 <textarea class="form-input" id="importDataInput" placeholder="Paste account data here - WARNING: This will replace ALL current save data!" style="display: none; height: 100px; resize: vertical;"></textarea>
+                
+                <input type="file" id="importFileInput" accept=".afs" style="display: none;" />
             </div>
         `;
         
         document.getElementById('createAccountBtn').addEventListener('click', () => this.createAccount());
         document.getElementById('importDataBtn').addEventListener('click', () => this.showImportInput());
+        document.getElementById('importFileBtn').addEventListener('click', () => this.showFileImport());
     }
     
     showLoggedInView(container) {
@@ -548,12 +552,14 @@ class AccountSystem {
             
             <div class="account-actions">
                 <button class="account-btn" id="copyDataBtn">Copy Save Data</button>
+                <button class="account-btn" id="downloadDataBtn">Download Save (.afs)</button>
                 <button class="account-btn secondary" id="logoutBtn">Logout</button>
             </div>
             
         `;
         
         document.getElementById('copyDataBtn').addEventListener('click', () => this.copyDataToClipboard());
+        document.getElementById('downloadDataBtn').addEventListener('click', () => this.downloadSaveData());
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
     }
     
@@ -565,6 +571,69 @@ class AccountSystem {
             importInput.style.display = 'block';
             importBtn.textContent = 'Import Account (Replace All)';
             importBtn.onclick = () => this.importSaveData();
+        }
+    }
+
+    showFileImport() {
+        const fileInput = document.getElementById('importFileInput');
+        
+        // Set up file change handler
+        fileInput.onchange = (e) => this.handleFileImport(e);
+        
+        // Trigger file picker
+        fileInput.click();
+    }
+
+    handleFileImport(event) {
+        const file = event.target.files[0];
+        
+        if (!file) return;
+        
+        // Check file extension
+        if (!file.name.endsWith('.afs')) {
+            alert('Please select a valid .afs (Aspenini Fun Save) file!');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const encodedData = e.target.result;
+                this.importFromEncodedData(encodedData);
+            } catch (error) {
+                alert('Invalid save file format!');
+            }
+        };
+        
+        reader.readAsText(file);
+        
+        // Clear the input for next use
+        event.target.value = '';
+    }
+
+    importFromEncodedData(encodedData) {
+        try {
+            const decoded = this.decodeData(encodedData);
+            const data = JSON.parse(decoded);
+            
+            // COMPLETELY REPLACE current save data (per account)
+            if (data.v === 1) {
+                // New compact format
+                this.currentUser = data.u;
+                this.saveData = data.s || {}; // Complete replacement
+            } else {
+                // Old format (backward compatibility)
+                this.currentUser = data.username;
+                this.saveData = data.saveData || {}; // Complete replacement
+            }
+            
+            this.saveAccount();
+            this.updateAccountDisplay();
+            this.hideAccountPanel();
+            
+            alert('Account imported successfully! All previous save data has been replaced.');
+        } catch (error) {
+            alert('Invalid save data format!');
         }
     }
     
@@ -599,29 +668,7 @@ class AccountSystem {
             return;
         }
         
-        try {
-            const decoded = this.decodeData(encodedData);
-            const data = JSON.parse(decoded);
-            
-            // COMPLETELY REPLACE current save data (per account)
-            if (data.v === 1) {
-                // New compact format
-                this.currentUser = data.u;
-                this.saveData = data.s || {}; // Complete replacement
-            } else {
-                // Old format (backward compatibility)
-                this.currentUser = data.username;
-                this.saveData = data.saveData || {}; // Complete replacement
-            }
-            
-            this.saveAccount();
-            this.updateAccountDisplay();
-            this.hideAccountPanel();
-            
-            alert('Account imported successfully! All previous save data has been replaced.');
-        } catch (error) {
-            alert('Invalid save data format!');
-        }
+        this.importFromEncodedData(encodedData);
     }
     
     
@@ -671,6 +718,35 @@ class AccountSystem {
         }
         
         document.body.removeChild(textArea);
+    }
+
+    downloadSaveData() {
+        // Create a more compact save data format
+        const compactData = {
+            u: this.currentUser, // username
+            s: this.saveData,    // saveData
+            v: 1                 // version
+        };
+        const encoded = this.encodeData(JSON.stringify(compactData));
+        
+        // Create filename with username and timestamp
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
+        const filename = `${this.currentUser}_${timestamp}.afs`;
+        
+        // Create download
+        const blob = new Blob([encoded], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        URL.revokeObjectURL(url);
+        
+        alert(`Save data downloaded as ${filename}!`);
     }
     
     logout() {

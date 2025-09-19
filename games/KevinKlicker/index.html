@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kevin Klicker - Aspenini-Fun</title>
+  <link rel="preload" as="image" href="assets/kevin.png">
+  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Click Kevin to rack up points! A tiny, offline‑friendly, static HTML clicker game." />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../../index.html" class="back-button" title="Back to Aspenini-Fun Hub">← Back to Hub</a>
+      <h1>Kevin Klicker</h1>
+    </div>
+    <button class="ghost" id="resetBtn" title="Wipe your save">Reset</button>
+  </header>
+
+  <main class="grid">
+    <section class="panel main-panel">
+      <div class="stats">
+        <div class="stat"><span class="label">Clicks</span><span id="score">0</span></div>
+        <div class="stat"><span class="label">CPS</span><span id="cps">0</span></div>
+        <div class="stat"><span class="label">Per Click</span><span id="perClick">1</span></div>
+      </div>
+
+      <button id="kevinBtn" class="kevin-btn" aria-label="Click Kevin!">
+        <img src="assets/kevin.png" alt="Kevin" draggable="false">
+        <span class="pop" id="pop">+1</span>
+      </button>
+
+      <p class="hint">Tip: Buy upgrades on the right. Your progress saves automatically.</p>
+    </section>
+
+    <aside class="panel shop-panel">
+      <h2>Upgrades</h2>
+
+      <div id="shop" class="shop">
+        <!-- Items will be injected by JS -->
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <small>Built as a static game. Works offline. &middot; <a href="#" id="exportBtn">Export Save</a> &middot; <label class="import">Import <input type="file" id="importFile" accept=".json" hidden></label></small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

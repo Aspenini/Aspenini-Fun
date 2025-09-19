@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspenini-Fun</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <h1 class="logo">Aspenini-Fun</h1>
+            <p class="tagline">Your Gateway to Amazing Games</p>
+        </header>
+
+        <main class="main-content">
+            <section class="games-section">
+                <h2 class="section-title">Available Games</h2>
+                <div class="games-grid" id="gamesGrid">
+                    <!-- Games will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <section class="stats-section">
+                <div class="stat-card">
+                    <h3 class="stat-number" id="gameCount">0</h3>
+                    <p class="stat-label">Games Available</p>
+                </div>
+                <div class="stat-card">
+                    <h3 class="stat-number">∞</h3>
+                    <p class="stat-label">Fun Guaranteed</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Aspenini-Fun. Ready to play?</p>
+        </footer>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Loading games...</p>
+    </div>
+
+    <!-- Games data for local file:// protocol -->
+    <script id="games-data" type="application/json">
+    [
+      {
+        "id": "eaglercraftx",
+        "title": "EaglercraftX",
+        "description": "Experience Minecraft in your browser! Build, explore, and survive in this web-based version of the beloved block-building game.",
+        "icon": "⛏️",
+        "path": "games/EaglercraftX/EaglercraftX.html",
+        "cover": "img/EaglercraftX.png",
+        "openInNewTab": true
+      },
+      {
+        "id": "kevin-klicker",
+        "title": "Kevin Klicker",
+        "description": "Click on Kevin Allen to earn points! How many clicks can you get? An addictive clicker game with upgrades and achievements.",
+        "icon": "👨",
+        "path": "games/KevinKlicker/index.html",
+        "cover": "img/KevinKlicker.png",
+        "openInNewTab": false
+      },
+      {
+        "id": "space-tetris",
+        "title": "Space Tetris",
+        "description": "Classic Tetris with a cosmic twist! Arrange falling blocks to clear lines in this space-themed puzzle game with glowing effects.",
+        "icon": "🧩",
+        "path": "games/SpaceTetris/index.html",
+        "openInNewTab": false
+      },
+      {
+        "id": "color-memory",
+        "title": "Color Memory Game",
+        "description": "Test your memory by remembering the sequence of colors. A fun brain training game that gets progressively more challenging!",
+        "icon": "🧠",
+        "path": "games/ColorMemory/index.html",
+        "openInNewTab": false
+      }
+    ]
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,382 @@
+/* Space Tetris - Matching Aspenini-Fun Hub Theme */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 35%, #0f0f23 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #e8e8ff;
+    /* Chromebook optimizations */
+    -webkit-font-smoothing: antialiased;
+    transform: translateZ(0);
+}
+
+/* Add subtle stars background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #ffffff20, transparent),
+        radial-gradient(2px 2px at 40px 70px, #ffffff15, transparent),
+        radial-gradient(1px 1px at 90px 40px, #ffffff25, transparent),
+        radial-gradient(1px 1px at 130px 80px, #ffffff20, transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(138, 119, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(138, 119, 255, 0.2);
+    box-shadow: 0 2px 10px rgba(138, 119, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-button {
+    color: #8a77ff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(138, 119, 255, 0.1);
+    border: 1px solid rgba(138, 119, 255, 0.2);
+    transition: all 0.2s ease;
+    font-weight: 500;
+    transform: translateZ(0);
+}
+
+.back-button:hover {
+    background: rgba(138, 119, 255, 0.2);
+    border-color: rgba(138, 119, 255, 0.3);
+    transform: translateY(-1px) translateZ(0);
+}
+
+.topbar h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(138, 119, 255, 0.3);
+}
+
+.controls-hint {
+    font-size: 0.9rem;
+    color: #b8b8ff;
+    opacity: 0.8;
+}
+
+.game-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 30px;
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.game-board {
+    position: relative;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
+    border: 2px solid rgba(138, 119, 255, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(138, 119, 255, 0.2);
+}
+
+#tetris {
+    display: block;
+    border: 2px solid rgba(138, 119, 255, 0.5);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 35, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.game-overlay.hidden {
+    display: none;
+}
+
+.overlay-content {
+    text-align: center;
+    padding: 30px;
+}
+
+.overlay-content h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.overlay-content p {
+    font-size: 1.1rem;
+    color: #b8b8ff;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.next-piece {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
+    border: 1px solid rgba(138, 119, 255, 0.15);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    text-align: center;
+}
+
+.next-piece h3 {
+    font-family: 'Orbitron', monospace;
+    color: #8a77ff;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(138, 119, 255, 0.3);
+}
+
+#nextPiece {
+    border: 1px solid rgba(138, 119, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.stats-panel, .controls-panel {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
+    border: 1px solid rgba(138, 119, 255, 0.15);
+    border-radius: 15px;
+    padding: 25px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(15, 15, 35, 0.3);
+}
+
+.stats-panel h3, .controls-panel h3 {
+    font-family: 'Orbitron', monospace;
+    color: #8a77ff;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(138, 119, 255, 0.3);
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.stat {
+    background: rgba(138, 119, 255, 0.1);
+    border: 1px solid rgba(138, 119, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #b8b8ff;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8a77ff;
+    font-family: 'Orbitron', monospace;
+}
+
+.control-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: rgba(138, 119, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(138, 119, 255, 0.15);
+}
+
+.key {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    color: #8a77ff;
+    background: rgba(138, 119, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.action {
+    color: #e8e8ff;
+}
+
+.game-controls {
+    display: flex;
+    gap: 15px;
+}
+
+.game-btn {
+    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.game-btn:hover {
+    transform: scale(1.03) translateZ(0);
+    box-shadow: 0 8px 25px rgba(138, 119, 255, 0.4);
+}
+
+.game-btn:active {
+    transform: scale(0.98) translateZ(0);
+}
+
+.game-btn.secondary {
+    background: rgba(138, 119, 255, 0.2);
+    border: 1px solid rgba(138, 119, 255, 0.3);
+}
+
+.game-btn.secondary:hover {
+    background: rgba(138, 119, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .game-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .game-info {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .stats-panel, .controls-panel {
+        flex: 1;
+        min-width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .topbar {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .controls-hint {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    
+    .game-container {
+        padding: 15px;
+    }
+    
+    .game-info {
+        flex-direction: column;
+    }
+    
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #tetris {
+        width: 250px;
+        height: 500px;
+    }
+}
+
+@media (max-width: 480px) {
+    .topbar h1 {
+        font-size: 1.5rem;
+    }
+    
+    .overlay-content h2 {
+        font-size: 2rem;
+    }
+    
+    #tetris {
+        width: 200px;
+        height: 400px;
+    }
+    
+    .game-controls {
+        flex-direction: column;
+    }
+}
+
+/* Reduce motion for accessibility and Chromebook performance */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

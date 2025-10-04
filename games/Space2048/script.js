@@ -1,17 +1,15 @@
-// Space 2048 - Full Game Implementation
+// Space 2048 - Proper Implementation
 class Space2048 {
     constructor() {
         this.size = 4;
         this.board = [];
-        this.previousBoard = [];
         this.score = 0;
-        this.previousScore = 0;
-        this.moves = 0;
         this.bestScore = parseInt(localStorage.getItem('space2048Best') || '0');
         this.gameStarted = false;
         this.gameWon = false;
         this.gameOver = false;
         this.animating = false;
+        this.previousBoard = [];
         
         // Account system integration
         this.accountData = null;
@@ -23,8 +21,7 @@ class Space2048 {
             reach512: { unlocked: false, title: "Half Way There", desc: "Reach 512", icon: "⭐" },
             reach1024: { unlocked: false, title: "So Close!", desc: "Reach 1024", icon: "🚀" },
             reach2048: { unlocked: false, title: "Space Champion!", desc: "Reach 2048", icon: "👑" },
-            score10k: { unlocked: false, title: "High Scorer", desc: "Score 10,000 points", icon: "💎" },
-            moves100: { unlocked: false, title: "Persistent", desc: "Make 100 moves in one game", icon: "💪" }
+            score10k: { unlocked: false, title: "High Scorer", desc: "Score 10,000 points", icon: "💎" }
         };
         
         this.loadAchievements();
@@ -46,7 +43,6 @@ class Space2048 {
         // Button controls
         document.getElementById('startButton').addEventListener('click', () => this.startGame());
         document.getElementById('newGameBtn').addEventListener('click', () => this.startGame());
-        document.getElementById('undoBtn').addEventListener('click', () => this.undoMove());
         
         // Touch controls for mobile
         let startX, startY;
@@ -67,11 +63,11 @@ class Space2048 {
             const diffY = startY - endY;
             
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 0) this.move('left');
-                else this.move('right');
+                if (diffX > 50) this.move('left');
+                else if (diffX < -50) this.move('right');
             } else {
-                if (diffY > 0) this.move('up');
-                else this.move('down');
+                if (diffY > 50) this.move('up');
+                else if (diffY < -50) this.move('down');
             }
             
             startX = startY = null;
@@ -108,11 +104,8 @@ class Space2048 {
     }
     
     startGame() {
-        this.board = Array(this.size).fill().map(() => Array(this.size).fill(0));
-        this.previousBoard = [];
+        this.board = this.createEmptyBoard();
         this.score = 0;
-        this.previousScore = 0;
-        this.moves = 0;
         this.gameStarted = true;
         this.gameWon = false;
         this.gameOver = false;
@@ -124,6 +117,10 @@ class Space2048 {
         this.hideOverlay();
         this.updateDisplay();
         this.renderBoard();
+    }
+    
+    createEmptyBoard() {
+        return Array(this.size).fill().map(() => Array(this.size).fill(0));
     }
     
     addRandomTile() {
@@ -139,6 +136,7 @@ class Space2048 {
         
         if (emptyCells.length > 0) {
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            // 90% chance for 2, 10% chance for 4
             this.board[randomCell.row][randomCell.col] = Math.random() < 0.9 ? 2 : 4;
         }
     }
@@ -146,56 +144,45 @@ class Space2048 {
     move(direction) {
         if (!this.gameStarted || this.gameOver || this.animating) return;
         
-        // Save current state for undo
-        this.previousBoard = this.board.map(row => [...row]);
-        this.previousScore = this.score;
-        
+        const oldBoard = this.board.map(row => [...row]);
         let moved = false;
-        const newBoard = this.board.map(row => [...row]);
         
-        if (direction === 'left') {
-            moved = this.moveLeft(newBoard);
-        } else if (direction === 'right') {
-            moved = this.moveRight(newBoard);
-        } else if (direction === 'up') {
-            moved = this.moveUp(newBoard);
-        } else if (direction === 'down') {
-            moved = this.moveDown(newBoard);
+        switch (direction) {
+            case 'left':
+                moved = this.moveLeft();
+                break;
+            case 'right':
+                moved = this.moveRight();
+                break;
+            case 'up':
+                moved = this.moveUp();
+                break;
+            case 'down':
+                moved = this.moveDown();
+                break;
         }
         
         if (moved) {
             this.animating = true;
-            this.moves++;
-            
             // Animate the move
-            this.animateMove(this.board, newBoard, direction, () => {
-                this.board = newBoard;
+            this.animateMove(oldBoard, this.board, direction, () => {
                 this.addRandomTile();
                 this.updateDisplay();
                 this.renderBoard();
                 this.checkAchievements();
+                this.checkGameStatus();
                 this.animating = false;
             });
-            
-            if (this.isGameWon() && !this.gameWon) {
-                this.gameWon = true;
-                // Show win message on screen instead of popup
-                this.showInGameMessage('🎉 You reached 2048! 🎉', 'success');
-            } else if (this.isGameOver()) {
-                this.gameOver = true;
-                // Show game over message on screen
-                this.showInGameMessage('Game Over!', 'error');
-            }
         }
     }
     
-    moveLeft(board) {
+    moveLeft() {
         let moved = false;
         
         for (let i = 0; i < this.size; i++) {
-            const row = board[i].filter(val => val !== 0);
+            const row = this.board[i].filter(val => val !== 0);
             
-            // Merge tiles
+            // Merge adjacent equal tiles
             for (let j = 0; j < row.length - 1; j++) {
                 if (row[j] === row[j + 1]) {
                     row[j] *= 2;
@@ -204,68 +191,69 @@ class Space2048 {
                 }
             }
             
-            // Fill with zeros
+            // Pad with zeros
             while (row.length < this.size) {
                 row.push(0);
             }
             
             // Check if anything changed
             for (let j = 0; j < this.size; j++) {
-                if (board[i][j] !== row[j]) {
+                if (this.board[i][j] !== row[j]) {
                     moved = true;
                 }
-                board[i][j] = row[j];
+                this.board[i][j] = row[j];
             }
         }
         
         return moved;
     }
     
-    moveRight(board) {
+    moveRight() {
         let moved = false;
         
         for (let i = 0; i < this.size; i++) {
-            const row = board[i].filter(val => val !== 0);
+            const row = this.board[i].filter(val => val !== 0);
             
-            // Merge tiles (from right)
+            // Merge adjacent equal tiles (from right)
             for (let j = row.length - 1; j > 0; j--) {
                 if (row[j] === row[j - 1]) {
                     row[j] *= 2;
                     this.score += row[j];
                     row.splice(j - 1, 1);
-                    j--;
                 }
             }
             
-            // Fill with zeros at the beginning
+            // Pad with zeros at the beginning
             while (row.length < this.size) {
                 row.unshift(0);
             }
             
             // Check if anything changed
             for (let j = 0; j < this.size; j++) {
-                if (board[i][j] !== row[j]) {
+                if (this.board[i][j] !== row[j]) {
                     moved = true;
                 }
-                board[i][j] = row[j];
+                this.board[i][j] = row[j];
             }
         }
         
         return moved;
     }
     
-    moveUp(board) {
+    moveUp() {
         let moved = false;
         
         for (let j = 0; j < this.size; j++) {
             const column = [];
+            
+            // Extract non-zero values
             for (let i = 0; i < this.size; i++) {
-                if (board[i][j] !== 0) {
-                    column.push(board[i][j]);
+                if (this.board[i][j] !== 0) {
+                    column.push(this.board[i][j]);
                 }
             }
             
-            // Merge tiles
+            // Merge adjacent equal tiles
             for (let i = 0; i < column.length - 1; i++) {
                 if (column[i] === column[i + 1]) {
                     column[i] *= 2;
@@ -274,82 +262,80 @@ class Space2048 {
                 }
             }
             
-            // Fill with zeros
+            // Pad with zeros
             while (column.length < this.size) {
                 column.push(0);
             }
             
-            // Check if anything changed and update board
+            // Update board
             for (let i = 0; i < this.size; i++) {
-                if (board[i][j] !== column[i]) {
+                if (this.board[i][j] !== column[i]) {
                     moved = true;
                 }
-                board[i][j] = column[i];
+                this.board[i][j] = column[i];
             }
         }
         
         return moved;
     }
     
-    moveDown(board) {
+    moveDown() {
         let moved = false;
         
         for (let j = 0; j < this.size; j++) {
             const column = [];
+            
+            // Extract non-zero values
             for (let i = 0; i < this.size; i++) {
-                if (board[i][j] !== 0) {
-                    column.push(board[i][j]);
+                if (this.board[i][j] !== 0) {
+                    column.push(this.board[i][j]);
                 }
             }
             
-            // Merge tiles (from bottom)
+            // Merge adjacent equal tiles (from bottom)
             for (let i = column.length - 1; i > 0; i--) {
                 if (column[i] === column[i - 1]) {
                     column[i] *= 2;
                     this.score += column[i];
                     column.splice(i - 1, 1);
-                    i--;
                 }
             }
             
-            // Fill with zeros at the beginning
+            // Pad with zeros at the beginning
             while (column.length < this.size) {
                 column.unshift(0);
             }
             
-            // Check if anything changed and update board
+            // Update board
             for (let i = 0; i < this.size; i++) {
-                if (board[i][j] !== column[i]) {
+                if (this.board[i][j] !== column[i]) {
                     moved = true;
                 }
-                board[i][j] = column[i];
+                this.board[i][j] = column[i];
             }
         }
         
         return moved;
     }
     
-    undoMove() {
-        if (this.previousBoard.length === 0) return;
-        
-        this.board = this.previousBoard.map(row => [...row]);
-        this.score = this.previousScore;
-        this.moves = Math.max(0, this.moves - 1);
-        this.previousBoard = [];
-        
-        this.updateDisplay();
-        this.renderBoard();
-    }
-    
-    isGameWon() {
+    checkGameStatus() {
+        // Check for win condition
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
                 if (this.board[i][j] >= 2048) {
-                    return true;
+                    if (!this.gameWon) {
+                        this.gameWon = true;
+                        this.showInGameMessage('🎉 You reached 2048! 🎉', 'success');
+                    }
                 }
             }
         }
-        return false;
+        
+        // Check for game over
+        if (this.isGameOver()) {
+            this.gameOver = true;
+            this.showInGameMessage('Game Over!', 'error');
+        }
     }
     
     isGameOver() {
@@ -366,8 +352,12 @@ class Space2048 {
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
                 const current = this.board[i][j];
-                if ((j < this.size - 1 && current === this.board[i][j + 1]) ||
-                    (i < this.size - 1 && current === this.board[i + 1][j])) {
+                // Check right neighbor
+                if (j < this.size - 1 && current === this.board[i][j + 1]) {
+                    return false;
+                }
+                // Check bottom neighbor
+                if (i < this.size - 1 && current === this.board[i + 1][j]) {
                     return false;
                 }
             }
@@ -376,127 +366,81 @@ class Space2048 {
         return true;
     }
     
-    renderBoard() {
-        const gameBoard = document.getElementById('gameBoard');
-        
-        // Initialize board container if not exists
-        if (!gameBoard.querySelector('.tile-container')) {
-            gameBoard.innerHTML = `
-                <div class="grid-container">
-                    ${Array(16).fill('<div class="grid-cell"></div>').join('')}
-                </div>
-                <div class="tile-container"></div>
-            `;
-        }
-        
-        const tileContainer = gameBoard.querySelector('.tile-container');
-        
-        // Clear existing tiles
-        tileContainer.innerHTML = '';
-        
-        // Create tiles with positions
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                const value = this.board[i][j];
-                if (value !== 0) {
-                    const tile = document.createElement('div');
-                    tile.className = 'tile';
-                    tile.textContent = value;
-                    tile.setAttribute('data-value', value);
-                    tile.setAttribute('data-row', i);
-                    tile.setAttribute('data-col', j);
-                    
-                    // Position tile using CSS transforms
-                    const x = j * 120 + (j * 15); // tile width + gap
-                    const y = i * 120 + (i * 15); // tile height + gap
-                    tile.style.transform = `translate(${x}px, ${y}px)`;
-                    
-                    // Add animation class for new tiles
-                    if (!this.previousBoard.length || this.previousBoard[i][j] !== value) {
-                        if (this.previousBoard.length && this.previousBoard[i][j] === 0) {
-                            tile.classList.add('new');
-                        } else if (this.previousBoard.length && this.previousBoard[i][j] !== 0 && this.previousBoard[i][j] !== value) {
-                            tile.classList.add('merged');
-                        }
-                    }
-                    
-                    tileContainer.appendChild(tile);
-                }
-            }
-        }
-        
-        // Update undo button state
-        document.getElementById('undoBtn').disabled = this.previousBoard.length === 0;
-    }
-
     animateMove(oldBoard, newBoard, direction, callback) {
-        const tileContainer = document.querySelector('.tile-container');
+        const gameBoard = document.getElementById('gameBoard');
         const animationDuration = 150;
         
-        // Create tiles for animation
+        // Create animated tiles
         const animatingTiles = [];
         
-        // Find tiles that moved
+        // Find tiles that moved or merged
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
                 const oldValue = oldBoard[i][j];
+                const newValue = newBoard[i][j];
+                
                 if (oldValue !== 0) {
                     // Find where this tile ended up
-                    const newPos = this.findTileDestination(oldBoard, newBoard, i, j, direction);
-                    if (newPos && (newPos.row !== i || newPos.col !== j)) {
+                    const destination = this.findTileDestination(oldBoard, newBoard, i, j, direction);
+                    
+                    if (destination && (destination.row !== i || destination.col !== j)) {
                         // Create animated tile
                         const tile = document.createElement('div');
-                        tile.className = 'tile';
+                        tile.className = 'tile animated-tile';
                         tile.textContent = oldValue;
                         tile.setAttribute('data-value', oldValue);
                         
-                        // Start position
-                        const startX = j * 135; // 120px width + 15px gap
-                        const startY = i * 135;
-                        tile.style.transform = `translate(${startX}px, ${startY}px)`;
+                        // Position at starting location
+                        const startRow = i;
+                        const startCol = j;
+                        const endRow = destination.row;
+                        const endCol = destination.col;
                         
-                        tileContainer.appendChild(tile);
-                        animatingTiles.push({
-                            element: tile,
-                            startX,
-                            startY,
-                            endX: newPos.col * 135,
-                            endY: newPos.row * 135
+                        tile.style.gridRow = startRow + 1;
+                        tile.style.gridColumn = startCol + 1;
+                        tile.style.zIndex = '100';
+                        
+                        gameBoard.appendChild(tile);
+                        
+                        // Animate to destination
+                        requestAnimationFrame(() => {
+                            tile.style.gridRow = endRow + 1;
+                            tile.style.gridColumn = endCol + 1;
+                            
+                            // Handle merged tiles
+                            if (oldValue !== newValue && newValue > oldValue) {
+                                setTimeout(() => {
+                                    tile.textContent = newValue;
+                                    tile.setAttribute('data-value', newValue);
+                                }, animationDuration / 2);
+                            }
                         });
+                        
+                        animatingTiles.push(tile);
                     }
                 }
             }
         }
         
-        // Animate tiles
-        if (animatingTiles.length > 0) {
-            // Start animation
-            requestAnimationFrame(() => {
-                animatingTiles.forEach(tile => {
-                    tile.element.style.transform = `translate(${tile.endX}px, ${tile.endY}px)`;
-                });
+        // Clean up after animation
+        setTimeout(() => {
+            animatingTiles.forEach(tile => {
+                if (tile.parentNode) {
+                    tile.parentNode.removeChild(tile);
+                }
             });
-            
-            // Clean up after animation
-            setTimeout(() => {
-                animatingTiles.forEach(tile => {
-                    tile.element.remove();
-                });
-                callback();
-            }, animationDuration);
-        } else {
             callback();
-        }
+        }, animationDuration);
     }
-
+    
     findTileDestination(oldBoard, newBoard, oldRow, oldCol, direction) {
-        const value = oldBoard[oldRow][oldCol];
+        const oldValue = oldBoard[oldRow][oldCol];
         
         // Find where this tile value appears in the new board
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
-                if (newBoard[i][j] === value) {
-                    // Check if this is the correct destination based on direction
+                if (newBoard[i][j] === oldValue || newBoard[i][j] === oldValue * 2) {
+                    // Check if this is a valid destination based on direction
                     if (this.isValidDestination(oldRow, oldCol, i, j, direction)) {
                         // Mark as used to avoid duplicate matching
                         newBoard[i][j] = -1;
@@ -507,7 +451,7 @@ class Space2048 {
         }
         return null;
     }
-
+    
     isValidDestination(oldRow, oldCol, newRow, newCol, direction) {
         switch (direction) {
             case 'left':
@@ -523,9 +467,51 @@ class Space2048 {
         }
     }
     
+    renderBoard() {
+        const gameBoard = document.getElementById('gameBoard');
+        
+        // Clear the board
+        gameBoard.innerHTML = '';
+        
+        // Create grid cells
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                
+                const value = this.board[i][j];
+                if (value !== 0) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.textContent = value;
+                    tile.setAttribute('data-value', value);
+                    
+                    // Add animation classes for new tiles
+                    if (this.previousBoard && this.previousBoard.length > 0) {
+                        const oldValue = this.previousBoard[i][j];
+                        if (oldValue === 0) {
+                            tile.classList.add('new');
+                        } else if (oldValue !== value && value > oldValue) {
+                            tile.classList.add('merged');
+                        }
+                    } else {
+                        // Initial tiles
+                        tile.classList.add('new');
+                    }
+                    
+                    cell.appendChild(tile);
+                }
+                
+                gameBoard.appendChild(cell);
+            }
+        }
+        
+        // Store current board state for next render
+        this.previousBoard = this.board.map(row => [...row]);
+    }
+    
     updateDisplay() {
         document.getElementById('score').textContent = this.score.toLocaleString();
-        document.getElementById('moves').textContent = this.moves.toString();
         
         if (this.score > this.bestScore) {
             this.bestScore = this.score;
@@ -556,22 +542,12 @@ class Space2048 {
         if (this.score >= 10000 && !this.achievements.score10k.unlocked) {
             this.unlockAchievement('score10k');
         }
-        
-        // Check move-based achievements
-        if (this.moves === 1 && !this.achievements.firstMove.unlocked) {
-            this.unlockAchievement('firstMove');
-        }
-        if (this.moves >= 100 && !this.achievements.moves100.unlocked) {
-            this.unlockAchievement('moves100');
-        }
     }
     
     unlockAchievement(id) {
         this.achievements[id].unlocked = true;
         this.saveAchievements();
         this.renderAchievements();
-        
-        // Just silently unlock, no popup
     }
     
     showInGameMessage(message, type = 'info') {

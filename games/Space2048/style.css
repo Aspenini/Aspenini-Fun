@@ -165,18 +165,28 @@ body::before {
 }
 
 .game-board {
-    width: 340px;
-    height: 340px;
+    width: 540px;
+    height: 540px;
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
     border: 2px solid rgba(138, 119, 255, 0.3);
     border-radius: 15px;
-    padding: 10px;
+    padding: 15px;
     backdrop-filter: blur(8px);
     box-shadow: 0 8px 32px rgba(138, 119, 255, 0.2);
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(4, 120px);
+    grid-template-rows: repeat(4, 120px);
+    gap: 15px;
+    position: relative;
+}
+
+.grid-cell {
+    background: rgba(138, 119, 255, 0.05);
+    border: 1px solid rgba(138, 119, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
 }
 
@@ -190,38 +200,18 @@ body::before {
     font-family: 'Orbitron', monospace;
     font-weight: 700;
     font-size: 1.5rem;
-    transition: transform 0.15s ease, opacity 0.15s ease;
+    transition: all 0.15s ease;
     transform: translateZ(0);
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    z-index: 10;
-}
-
-.grid-container {
+    width: 100%;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: repeat(4, 120px);
-    grid-template-rows: repeat(4, 120px);
-    gap: 15px;
-    z-index: 1;
 }
 
-.grid-cell {
-    background: rgba(138, 119, 255, 0.05);
-    border: 1px solid rgba(138, 119, 255, 0.1);
-    border-radius: 8px;
-}
-
-.tile-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
+.animated-tile {
+    transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 100 !important;
 }
 
 .tile.empty {
@@ -241,8 +231,36 @@ body::before {
 .tile[data-value="1024"] { background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; font-size: 1rem; }
 .tile[data-value="2048"] { background: linear-gradient(135deg, #ffd700, #ffb300); color: #333; font-size: 1rem; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
 
+/* Animation for new tiles */
 .tile.new {
     animation: tileAppear 0.2s ease;
+}
+
+.tile.merged {
+    animation: tileMerge 0.2s ease;
+}
+
+@keyframes tileAppear {
+    0% { 
+        transform: scale(0) translateZ(0); 
+        opacity: 0;
+    }
+    100% { 
+        transform: scale(1) translateZ(0); 
+        opacity: 1;
+    }
+}
+
+@keyframes tileMerge {
+    0% { 
+        transform: scale(1) translateZ(0); 
+    }
+    50% { 
+        transform: scale(1.1) translateZ(0); 
+    }
+    100% { 
+        transform: scale(1) translateZ(0); 
+    }
 }
 
 .tile.merged {
@@ -551,8 +569,12 @@ body::before {
     }
     
     .game-board {
-        width: 280px;
-        height: 280px;
+        width: 460px;
+        height: 460px;
+        padding: 12px;
+        grid-template-columns: repeat(4, 100px);
+        grid-template-rows: repeat(4, 100px);
+        gap: 12px;
     }
     
     .tile {
@@ -595,8 +617,12 @@ body::before {
     }
     
     .game-board {
-        width: 240px;
-        height: 240px;
+        width: 380px;
+        height: 380px;
+        padding: 10px;
+        grid-template-columns: repeat(4, 80px);
+        grid-template-rows: repeat(4, 80px);
+        gap: 10px;
     }
     
     .controls-grid {

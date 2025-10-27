@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Pong - Aspenini-Fun</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Multiplayer Pong powered by WebRTC - Play against a friend in this space-themed classic!">
+</head>
+<body>
+    <div class="container">
+        <header class="topbar">
+            <div class="topbar-left">
+                <a href="../../index.html" class="back-button" title="Back to Aspenini-Fun Hub">← Back to Hub</a>
+                <h1>⚡ WebRTC Pong</h1>
+            </div>
+            <div class="status" id="status">Disconnected</div>
+        </header>
+
+        <!-- Connection Panel -->
+        <div class="connection-panel" id="connectionPanel">
+            <h2>🎮 P2P Multiplayer Pong</h2>
+            <p class="description">Connect to a friend using WebRTC for direct peer-to-peer gameplay!</p>
+            
+            <div class="connection-mode">
+                <button class="mode-btn active" id="hostBtn">Host Game</button>
+                <button class="mode-btn" id="joinBtn">Join Game</button>
+            </div>
+
+            <!-- Host View -->
+            <div class="connection-view" id="hostView">
+                <div class="info-box" id="startServerBox">
+                    <h3>🎮 Ready to host?</h3>
+                    <p class="hint">Click the button below to start your game server and get a shareable code.</p>
+                    <button class="copy-btn big-btn" id="startServerBtn">Start Server</button>
+                </div>
+                
+                <div class="info-box" id="offerCodeBox" style="display: none;">
+                    <h3>📤 Share this code with your friend:</h3>
+                    <div class="code-display">
+                        <textarea id="offerCode" readonly></textarea>
+                        <button class="copy-btn" id="copyOfferBtn">📋 Copy</button>
+                    </div>
+                    <p class="hint">Send this code to your friend so they can join!</p>
+                    <div class="waiting-indicator">⏳ Waiting for player to join...</div>
+                    <button class="copy-btn" id="showAcceptBtn" style="margin-top: 15px;">Got their answer code? Click here</button>
+                </div>
+                
+                <div class="info-box connection-request" id="connectionRequest" style="display: none;">
+                    <h3>🎮 Player wants to join!</h3>
+                    <p class="hint">A player is requesting to join your game. Paste their answer code below:</p>
+                    <textarea id="answerCode" placeholder="Paste the answer code here..."></textarea>
+                    <div class="action-buttons">
+                        <button class="copy-btn accept-btn" id="acceptBtn">✓ Accept</button>
+                        <button class="copy-btn reject-btn" id="rejectBtn">✗ Reject</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Join View -->
+            <div class="connection-view" id="joinView" style="display: none;">
+                <div class="info-box">
+                    <h3>📥 Enter host's code:</h3>
+                    <textarea id="receivedOffer" placeholder="Paste the code from the host here..."></textarea>
+                    <button class="copy-btn big-btn" id="connectAsGuestBtn">Join Game</button>
+                </div>
+                <div class="info-box" id="answerBoxGuest" style="display: none;">
+                    <h3>📤 Send this code to the host:</h3>
+                    <div class="code-display">
+                        <textarea id="guestAnswer" readonly></textarea>
+                        <button class="copy-btn" id="copyAnswerBtn">📋 Copy</button>
+                    </div>
+                    <p class="hint">Copy this code and send it to the host. Wait for them to accept your connection!</p>
+                    <div class="waiting-indicator">⏳ Waiting for host to accept...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Panel -->
+        <div class="game-panel" id="gamePanel" style="display: none;">
+            <div class="score-board">
+                <div class="score">
+                    <div class="player-label">You</div>
+                    <div class="score-value" id="playerScore">0</div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="score">
+                    <div class="player-label">Opponent</div>
+                    <div class="score-value" id="opponentScore">0</div>
+                </div>
+            </div>
+            
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="instructions" id="instructions">
+                <p><strong>W/S</strong> or <strong>↑/↓</strong> - Move paddle</p>
+                <p><strong>P</strong> - Pause</p>
+            </div>
+        </div>
+
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <script src="../account-bridge.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

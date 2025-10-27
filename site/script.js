@@ -131,21 +131,6 @@ class GameHub {
             this.games = [];
         }
     }
-    
-
-    // Method to add a new game (for future use)
-    addGame(gameData) {
-        this.games.push(gameData);
-        
-        // Show updated games array for easy copying to HTML
-        console.log('Game added:', gameData);
-        console.log('Updated games list (copy this to HTML games-data script tag):');
-        console.log(JSON.stringify(this.games, null, 6));
-        
-        // Re-render the games
-        this.renderGames();
-        this.updateStats();
-    }
 
     formatTitle(gameName) {
         return gameName

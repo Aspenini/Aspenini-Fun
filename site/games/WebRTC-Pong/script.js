@@ -31,6 +31,8 @@ class PongGame {
         // Game state
         this.keys = {};
         this.lastUpdate = 0;
+        this.ballLaunched = false;
+        this.gameStarted = false;
         
         // STUN servers
         this.stunServers = [{ urls: 'stun:stun.l.google.com:19302' }];
@@ -101,8 +103,14 @@ class PongGame {
         document.addEventListener('keydown', (e) => {
             this.keys[e.key.toLowerCase()] = true;
             
-            if (e.key.toLowerCase() === 'p' && this.isConnected) {
+            if (e.key.toLowerCase() === 'p' && this.isConnected && this.gameStarted) {
                 this.togglePause();
+            }
+            
+            // Host launches ball with spacebar
+            if (e.key === ' ' && this.isHost && this.isConnected && !this.ballLaunched) {
+                e.preventDefault();
+                this.launchBall();
             }
         });
         
@@ -406,6 +414,10 @@ class PongGame {
             this.updateScoreDisplay();
         } else if (data.type === 'reset') {
             this.resetRound();
+        } else if (data.type === 'launch') {
+            this.ballLaunched = true;
+            this.gameStarted = true;
+            this.showNotification('Game started!');
         }
     }
     
@@ -422,6 +434,13 @@ class PongGame {
         // Reset game
         this.resetGame();
         
+        // Show instructions based on role
+        if (this.isHost) {
+            this.showNotification('Press SPACEBAR to launch the ball!');
+        } else {
+            this.showNotification('Waiting for host to start...');
+        }
+        
         // Start appropriate game loop
         if (this.isHost) {
             this.lastUpdate = performance.now();
@@ -434,10 +453,12 @@ class PongGame {
     resetGame() {
         this.playerScore = 0;
         this.opponentScore = 0;
+        this.ballLaunched = false;
+        this.gameStarted = false;
         this.ball.x = 400;
         this.ball.y = 250;
-        this.ball.dx = (Math.random() > 0.5 ? 1 : -1) * 5;
-        this.ball.dy = (Math.random() - 0.5) * 5;
+        this.ball.dx = 0;
+        this.ball.dy = 0;
         
         this.paddle1.y = 200;
         this.paddle2.y = 200;
@@ -446,10 +467,28 @@ class PongGame {
     }
     
     resetRound() {
+        this.ballLaunched = false;
         this.ball.x = 400;
         this.ball.y = 250;
+        this.ball.dx = 0;
+        this.ball.dy = 0;
+        
+        if (this.isHost) {
+            this.showNotification('Press SPACEBAR to launch!');
+        } else {
+            this.showNotification('Waiting for host...');
+        }
+    }
+    
+    launchBall() {
+        this.ballLaunched = true;
+        this.gameStarted = true;
         this.ball.dx = (Math.random() > 0.5 ? 1 : -1) * 5;
         this.ball.dy = (Math.random() - 0.5) * 5;
+        
+        // Notify guest that ball is launched
+        this.sendMessage({ type: 'launch' });
+        this.showNotification('Ball launched!');
     }
     
     togglePause() {
@@ -484,9 +523,12 @@ class PongGame {
         // Send paddle position to opponent
         this.sendMessage({ type: 'paddle', y: this.paddle1.y });
         
-        // Update ball (only host simulates)
-        this.ball.x += this.ball.dx;
-        this.ball.y += this.ball.dy;
+        // Only update ball if it's been launched
+        if (this.ballLaunched) {
+            // Update ball (only host simulates)
+            this.ball.x += this.ball.dx;
+            this.ball.y += this.ball.dy;
+        }
         
         // Wall collisions
         if (this.ball.y <= this.ball.radius || this.ball.y >= this.canvas.height - this.ball.radius) {
@@ -616,6 +658,18 @@ class PongGame {
             this.ctx.font = '48px Orbitron, monospace';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
+        }
+        
+        // Draw start indicator
+        if (!this.ballLaunched && this.isConnected) {
+            this.ctx.fillStyle = 'rgba(138, 119, 255, 0.8)';
+            this.ctx.font = '32px Orbitron, monospace';
+            this.ctx.textAlign = 'center';
+            if (this.isHost) {
+                this.ctx.fillText('Press SPACEBAR to start', this.canvas.width / 2, this.canvas.height / 2);
+            } else {
+                this.ctx.fillText('Waiting for host...', this.canvas.width / 2, this.canvas.height / 2);
+            }
         }
     }
     

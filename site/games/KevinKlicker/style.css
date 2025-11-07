@@ -1,10 +1,10 @@
-/* Hide back button when running inline */
-body.inline-mode .back-button {
+/* Hide topbar completely when running inline (hub provides overlay) */
+body.aspenini-inline-mode .topbar {
     display: none !important;
 }
 
 /* Inline mode adjustments */
-body.inline-mode {
+body.aspenini-inline-mode {
     /* Remove fixed positioning that might cause issues in iframe */
     position: relative;
     /* Ensure proper scaling */
@@ -13,20 +13,10 @@ body.inline-mode {
     overflow: hidden;
 }
 
-body.inline-mode .topbar {
-    /* Reduce padding in inline mode */
-    padding: 10px 15px;
-}
-
-body.inline-mode .grid {
+body.aspenini-inline-mode .grid {
     /* Adjust grid layout for iframe */
-    height: calc(100vh - 60px);
+    height: 100vh;
     overflow-y: auto;
-}
-
-/* Hide the title in the second bar when in inline mode */
-body.inline-mode .topbar h1 {
-    display: none;
 }
 
 /* Kevin Klicker styles: space-themed to match Aspenini-Fun hub */
@@ -66,65 +56,125 @@ body{
   gap: 16px;
 }
 
-.back-button {
-  color: var(--acc);
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(138, 119, 255, 0.1);
-  border: 1px solid rgba(138, 119, 255, 0.2);
-  transition: all 0.2s ease;
-  font-weight: 500;
-  /* Chromebook optimizations */
-  transform: translateZ(0);
+.topbar h1{
+  margin:0; 
+  font-size:clamp(1.2rem, 2vw, 2rem); 
+  letter-spacing:.6px;
 }
 
-.back-button:hover {
-  background: rgba(138, 119, 255, 0.2);
-  border-color: rgba(138, 119, 255, 0.3);
-  transform: translateY(-1px) translateZ(0);
-}
-
-.topbar h1{margin:0; font-size:clamp(1.2rem, 2.2vw, 1.8rem); letter-spacing:.6px}
 button.ghost{
-  background:transparent; color:var(--warn); border:1px solid #ffffff1a; padding:8px 12px; border-radius:10px; cursor:pointer;
+  background:transparent; 
+  color:var(--warn); 
+  border:1px solid #ffffff1a; 
+  padding:clamp(8px, 1vw, 12px) clamp(12px, 1.5vw, 16px); 
+  border-radius:10px; 
+  cursor:pointer;
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
 }
-button.ghost:hover{background:#ffffff10}
+
+button.ghost:hover{
+  background:#ffffff10;
+}
 
 .grid{
-  display:grid; gap:16px; grid-template-columns: 1fr 340px;
-  padding:16px; max-width:1100px; margin:0 auto;
+  display:grid; 
+  gap:clamp(16px, 2vw, 32px); 
+  grid-template-columns: minmax(400px, 1fr) minmax(300px, 450px);
+  padding:clamp(16px, 2vw, 32px); 
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
+
+@media (min-width: 1200px){
+  .grid{
+    grid-template-columns: minmax(500px, 1.5fr) minmax(350px, 500px);
+    gap: clamp(20px, 2.5vw, 40px);
+    padding: clamp(20px, 2.5vw, 40px);
+  }
+}
+
+@media (min-width: 1600px){
+  .grid{
+    grid-template-columns: minmax(600px, 2fr) minmax(400px, 600px);
+    gap: clamp(24px, 3vw, 48px);
+    padding: clamp(24px, 3vw, 48px);
+  }
+}
+
 @media (max-width: 900px){
-  .grid{grid-template-columns: 1fr}
+  .grid{
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
 }
 
 .panel{
   background:linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
   border:1px solid rgba(138, 119, 255, 0.15); border-radius:16px; 
   box-shadow: 0 4px 20px rgba(15, 15, 35, 0.3); 
-  padding:16px;
+  padding:clamp(16px, 2vw, 32px);
   backdrop-filter: blur(8px);
   /* Chromebook optimizations */
   transform: translateZ(0);
+  height: fit-content;
+  min-height: 0;
+}
+
+@media (min-width: 1200px) {
+  .panel {
+    padding: clamp(20px, 2.5vw, 40px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .panel {
+    padding: clamp(24px, 3vw, 48px);
+  }
 }
 
 .stats{
-  display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:10px;
+  display:grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap:clamp(12px, 1.5vw, 24px); 
+  margin-bottom:clamp(10px, 1.5vw, 24px);
 }
+
 .stat{
-  background:#0f1218; border:1px solid #ffffff10; border-radius:12px; padding:10px 12px; text-align:center;
+  background:#0f1218; 
+  border:1px solid #ffffff10; 
+  border-radius:12px; 
+  padding:clamp(10px, 1.5vw, 20px) clamp(12px, 1.5vw, 24px); 
+  text-align:center;
 }
-.stat .label{display:block; color:var(--muted); font-size:.84rem; margin-bottom:4px}
-.stat span:last-child{font-weight:700; font-size:1.25rem}
+
+.stat .label{
+  display:block; 
+  color:var(--muted); 
+  font-size:clamp(0.84rem, 1vw, 1.1rem); 
+  margin-bottom:clamp(4px, 0.5vw, 8px);
+}
+
+.stat span:last-child{
+  font-weight:700; 
+  font-size:clamp(1.25rem, 2vw, 2rem);
+}
 
 .kevin-btn{
-  display:grid; place-items:center; width:min(380px, 70vw); aspect-ratio:1; margin:18px auto;
-  border-radius:50%; border:none; cursor:pointer; 
+  display:grid; 
+  place-items:center; 
+  width:min(clamp(300px, 30vw, 500px), clamp(300px, 50vh, 600px)); 
+  aspect-ratio:1; 
+  margin:clamp(18px, 2vw, 32px) auto;
+  border-radius:50%; 
+  border:none; 
+  cursor:pointer; 
   background: radial-gradient(circle at 30% 25%, #8a77ff, #4c9aff 60%);
   box-shadow:0 12px 30px rgba(138, 119, 255, 0.3), inset 0 6px 14px rgba(255,255,255,.05);
   transition: transform .06s ease;
-  position:relative; overflow:hidden;
+  position:relative; 
+  overflow:hidden;
   /* Chromebook optimizations */
   transform: translateZ(0);
   will-change: transform;
@@ -132,38 +182,113 @@ button.ghost:hover{background:#ffffff10}
 .kevin-btn img{width:82%; user-select:none; pointer-events:none; filter: drop-shadow(0 10px 10px rgba(0,0,0,.35));}
 .kevin-btn:active{transform: scale(.98)}
 .pop{
-  position:absolute; inset:auto 0 16px 0; margin:auto; width:max-content; padding:6px 10px; border-radius:999px;
-  background:#0f172a; border:1px solid #ffffff20; color:var(--acc); font-weight:700; opacity:0; transform: translateY(10px) scale(.9);
-  transition: all .22s ease; pointer-events:none;
+  position:absolute; 
+  inset:auto 0 clamp(16px, 2vw, 24px) 0; 
+  margin:auto; 
+  width:max-content; 
+  padding:clamp(6px, 0.8vw, 12px) clamp(10px, 1.2vw, 16px); 
+  border-radius:999px;
+  background:#0f172a; 
+  border:1px solid #ffffff20; 
+  color:var(--acc); 
+  font-weight:700; 
+  opacity:0; 
+  transform: translateY(10px) scale(.9);
+  transition: all .22s ease; 
+  pointer-events:none;
+  font-size: clamp(1rem, 1.3vw, 1.3rem);
+  z-index: 3;
 }
 
-.hint{color:var(--muted); text-align:center}
+.hint{
+  color:var(--muted); 
+  text-align:center;
+  margin-top: clamp(12px, 1.5vw, 20px);
+  font-size: clamp(0.9rem, 1.1vw, 1.1rem);
+}
 
-.shop-panel h2{margin:8px 0 12px 0}
+.shop-panel h2{
+  margin:clamp(8px, 1vw, 16px) 0 clamp(12px, 1.5vw, 24px) 0;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+}
+
 .shop{
-  display:grid; gap:10px;
+  display:grid; 
+  gap:clamp(10px, 1.5vw, 20px);
 }
+
 .item{
-  display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center; padding:10px; border-radius:12px;
-  background:#0f1218; border:1px solid #ffffff10;
+  display:grid; 
+  grid-template-columns: 1fr auto; 
+  gap:clamp(8px, 1vw, 16px); 
+  align-items:center; 
+  padding:clamp(10px, 1.5vw, 20px); 
+  border-radius:12px;
+  background:#0f1218; 
+  border:1px solid #ffffff10;
 }
-.item .meta{display:flex; gap:10px; flex-direction:column}
-.item h3{margin:0; font-size:1rem}
-.item p{margin:0; color:var(--muted); font-size:.9rem}
-.item .buy{
-  align-self:stretch; min-width:120px; border-radius:10px; border:none; cursor:pointer; font-weight:700;
-  background:linear-gradient(45deg, #8a77ff, #4c9aff); color:white; padding:10px 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+.item .meta{
+  display:flex; 
+  gap:clamp(10px, 1vw, 16px); 
+  flex-direction:column;
+}
+
+.item h3{
+  margin:0; 
+  font-size:clamp(1rem, 1.5vw, 1.4rem);
+}
+
+.item p{
+  margin:0; 
+  color:var(--muted); 
+  font-size:clamp(0.9rem, 1.2vw, 1.1rem);
+}
+
+.item .buy {
+  align-self:stretch; 
+  min-width:clamp(120px, 12vw, 180px); 
+  border-radius:10px; 
+  border:none; 
+  cursor:pointer; 
+  font-weight:700;
+  background:linear-gradient(45deg, #8a77ff, #4c9aff); 
+  color:white; 
+  padding:clamp(10px, 1.2vw, 16px) clamp(12px, 1.5vw, 20px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   /* Chromebook optimizations */
   transform: translateZ(0);
+  font-size: clamp(0.9rem, 1.1vw, 1.1rem);
 }
 
 .item .buy:hover:not(:disabled) {
   transform: scale(1.02) translateZ(0);
   box-shadow: 0 4px 15px rgba(138, 119, 255, 0.3);
 }
-.item .buy:disabled{opacity:.5; cursor:not-allowed}
 
-.footer{max-width:1100px; margin:8px auto 30px; padding:0 16px; color:var(--muted); text-align:center}
-.footer a{color:var(--acc); text-decoration:none}
-.footer .import{cursor:pointer}
+.item .buy:active:not(:disabled) {
+  transform: scale(0.98) translateZ(0);
+}
+
+.item .buy:disabled{
+  opacity:.5; cursor:not-allowed;
+  background: rgba(138, 119, 255, 0.2);
+}
+
+.footer{
+  max-width:100%; 
+  margin:clamp(8px, 1vw, 16px) auto clamp(30px, 3vw, 50px); 
+  padding:0 clamp(16px, 2vw, 32px); 
+  color:var(--muted); 
+  text-align:center;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+}
+
+.footer a{
+  color:var(--acc); 
+  text-decoration:none;
+}
+
+.footer .import{
+  cursor:pointer;
+}

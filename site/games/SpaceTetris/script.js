@@ -26,8 +26,8 @@ class SpaceTetris {
         // Load best score
         this.bestScore = parseInt(localStorage.getItem('spaceTetrisBest') || '0');
         
-        // Account system integration
-        this.accountData = null;
+        // Load save data using Aspenini SDK
+        this.loadSaveData();
         
         // Tetris pieces (tetrominoes)
         this.pieces = {
@@ -85,9 +85,9 @@ class SpaceTetris {
     init() {
         this.initBoard();
         this.bindEvents();
-        this.setupAccountIntegration();
+        this.setupAutoSave();
         this.updateDisplay();
-        this.showOverlay('Space Tetris', 'Press SPACE or click START to begin your cosmic puzzle adventure!');
+        this.updateButton();
     }
     
     initBoard() {
@@ -99,24 +99,43 @@ class SpaceTetris {
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
         
         // Button controls
-        document.getElementById('startButton').addEventListener('click', () => this.startGame());
-        document.getElementById('pauseButton').addEventListener('click', () => this.togglePause());
+        document.getElementById('gameButton').addEventListener('click', () => {
+            if (!this.gameRunning) {
+                this.startGame();
+            } else {
+                this.togglePause();
+            }
+        });
         document.getElementById('restartButton').addEventListener('click', () => this.restartGame());
         
         // Prevent context menu on canvas
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     }
     
+    updateButton() {
+        const button = document.getElementById('gameButton');
+        if (!button) return;
+        
+        if (!this.gameRunning) {
+            button.textContent = 'Start';
+        } else if (this.isPaused) {
+            button.textContent = 'Resume';
+        } else {
+            button.textContent = 'Pause';
+        }
+    }
+    
     handleKeyPress(e) {
         if (!this.gameRunning || this.isPaused) {
-            if (e.code === 'Space') {
+            if (e.code === 'Space' || e.code === 'Enter') {
                 if (!this.gameRunning) {
                     this.startGame();
                 } else if (this.isPaused) {
                     this.togglePause();
                 }
+                return;
             }
-            if (e.code === 'KeyP') {
+            if (e.code === 'KeyP' && this.gameRunning) {
                 this.togglePause();
             }
             return;
@@ -159,14 +178,15 @@ class SpaceTetris {
         this.initBoard();
         this.currentPiece = this.createPiece();
         this.nextPiece = this.createPiece();
-        this.hideOverlay();
         this.updateDisplay();
+        this.updateButton();
         this.gameLoop();
     }
     
     restartGame() {
         this.gameRunning = false;
         this.isPaused = false;
+        this.updateButton();
         this.startGame();
     }
     
@@ -174,12 +194,9 @@ class SpaceTetris {
         if (!this.gameRunning) return;
         
         this.isPaused = !this.isPaused;
-        document.getElementById('pauseButton').textContent = this.isPaused ? 'Resume' : 'Pause';
+        this.updateButton();
         
-        if (this.isPaused) {
-            this.showOverlay('Game Paused', 'Press P or click Resume to continue');
-        } else {
-            this.hideOverlay();
+        if (!this.isPaused) {
             this.gameLoop();
         }
     }
@@ -337,14 +354,10 @@ class SpaceTetris {
         }
         
         this.updateDisplay();
-        this.showOverlay('Game Over', 
-            `Final Score: ${this.score.toLocaleString()}\n` +
-            `Lines Cleared: ${this.lines}\n` +
-            `Level Reached: ${this.level}\n\n` +
-            `${this.score === this.bestScore ? '🎉 New Best Score! 🎉\n\n' : ''}` +
-            `Press SPACE or click START to play again!`);
+        // Show game over alert
+        alert(`Game Over!\nFinal Score: ${this.score.toLocaleString()}\nLines Cleared: ${this.lines}\nLevel Reached: ${this.level}\n\n${this.score === this.bestScore ? '🎉 New Best Score! 🎉\n\n' : ''}Click Restart to play again!`);
         
-        document.getElementById('pauseButton').textContent = 'Pause';
+        this.updateButton();
     }
     
     gameLoop() {
@@ -364,15 +377,19 @@ class SpaceTetris {
     }
     
     draw() {
-        // Clear canvas
+        // Clear canvas completely to remove artifacts
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Draw semi-transparent background overlay
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw board
         this.drawBoard();
         
-        // Draw current piece
+        // Draw current piece with glow effect
         if (this.currentPiece) {
+            this.ctx.globalAlpha = 1.0;
             this.drawPiece(this.currentPiece, this.ctx);
         }
         
@@ -384,28 +401,51 @@ class SpaceTetris {
         for (let row = 0; row < this.boardHeight; row++) {
             for (let col = 0; col < this.boardWidth; col++) {
                 if (this.board[row][col]) {
-                    this.ctx.fillStyle = this.board[row][col];
+                    const color = this.board[row][col];
+                    
+                    // Add glow to placed pieces
+                    this.ctx.shadowColor = color;
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowOffsetX = 0;
+                    this.ctx.shadowOffsetY = 0;
+                    
+                    this.ctx.fillStyle = color;
                     this.ctx.fillRect(
                         col * this.blockSize,
                         row * this.blockSize,
                         this.blockSize - 1,
                         this.blockSize - 1
                     );
+                    
+                    // Reset shadow
+                    this.ctx.shadowBlur = 0;
                 }
             }
         }
     }
     
     drawPiece(piece, context) {
-        context.fillStyle = piece.color;
+        context.globalAlpha = 1.0;
         
+        // Draw pieces with glow effect
         for (let row = 0; row < piece.shape.length; row++) {
             for (let col = 0; col < piece.shape[row].length; col++) {
                 if (piece.shape[row][col]) {
                     const x = (piece.x + col) * this.blockSize;
                     const y = (piece.y + row) * this.blockSize;
                     
+                    // Add glow shadow
+                    context.shadowColor = piece.color;
+                    context.shadowBlur = 10;
+                    context.shadowOffsetX = 0;
+                    context.shadowOffsetY = 0;
+                    
+                    // Draw the block
+                    context.fillStyle = piece.color;
                     context.fillRect(x, y, this.blockSize - 1, this.blockSize - 1);
+                    
+                    // Reset shadow
+                    context.shadowBlur = 0;
                 }
             }
         }
@@ -413,7 +453,10 @@ class SpaceTetris {
     
     
     drawNextPiece() {
-        // Clear next piece canvas
+        // Clear next piece canvas completely to remove artifacts
+        this.nextCtx.clearRect(0, 0, this.nextCanvas.width, this.nextCanvas.height);
+        
+        // Draw semi-transparent background overlay
         this.nextCtx.fillStyle = 'rgba(0, 0, 0, 0.1)';
         this.nextCtx.fillRect(0, 0, this.nextCanvas.width, this.nextCanvas.height);
         
@@ -447,54 +490,52 @@ class SpaceTetris {
         document.getElementById('bestScore').textContent = this.bestScore.toLocaleString();
     }
     
-    showOverlay(title, message) {
-        document.getElementById('overlayTitle').textContent = title;
-        document.getElementById('overlayMessage').textContent = message;
-        document.getElementById('gameOverlay').classList.remove('hidden');
+    showOverlay() {
+        // Overlay removed - no-op
     }
     
     hideOverlay() {
-        document.getElementById('gameOverlay').classList.add('hidden');
+        // Overlay removed - no-op
     }
     
-    setupAccountIntegration() {
-        // Listen for account data from the bridge
-        window.addEventListener('accountDataLoaded', (event) => {
-            this.accountData = event.detail;
-            this.loadFromAccount();
-        });
-        
-        // Try to load immediately if already available
-        setTimeout(() => {
-            this.loadFromAccount();
-        }, 100);
-        
-        // Auto-save to account every 10 seconds
-        setInterval(() => {
-            this.saveToAccount();
-        }, 10000);
-    }
-    
-    saveToAccount() {
-        const saveData = {
-            bestScore: this.bestScore
-        };
-        
-        if (window.saveToAccount) {
-            window.saveToAccount(saveData);
+    loadSaveData() {
+        // Wait for SDK to be ready, then load save data
+        if (window.Aspenini) {
+            const saveData = window.Aspenini.load();
+            if (saveData && saveData.bestScore) {
+                if (saveData.bestScore > this.bestScore) {
+                    this.bestScore = saveData.bestScore;
+                    localStorage.setItem('spaceTetrisBest', this.bestScore.toString());
+                    this.updateDisplay();
+                }
+            }
+        } else {
+            // SDK not loaded yet, wait for it
+            window.addEventListener('aspenini:ready', () => {
+                this.loadSaveData();
+            }, { once: true });
         }
     }
     
-    loadFromAccount() {
-        const accountSave = window.loadFromAccount();
-        if (accountSave) {
-            if (accountSave.bestScore && accountSave.bestScore > this.bestScore) {
-                this.bestScore = accountSave.bestScore;
-                localStorage.setItem('spaceTetrisBest', this.bestScore.toString());
-                this.updateDisplay();
-            }
-            
-            console.log('Loaded Space Tetris save from account system');
+    setupAutoSave() {
+        // Auto-save every 10 seconds
+        setInterval(() => {
+            this.saveGameData();
+        }, 10000);
+        
+        // Also save when best score changes
+        const originalGameOver = this.gameOver.bind(this);
+        this.gameOver = () => {
+            originalGameOver();
+            this.saveGameData();
+        };
+    }
+    
+    saveGameData() {
+        if (window.Aspenini) {
+            window.Aspenini.save({
+                bestScore: this.bestScore
+            });
         }
     }
 }

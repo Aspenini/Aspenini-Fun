@@ -305,8 +305,9 @@ class GameHub {
         }
         
         if (event.data.type === 'SAVE_GAME_DATA' && this.currentGameId) {
-            // Save game data to account system
-            window.accountSystem.setGameSave(this.currentGameId, event.data.data);
+            // Save game data to account system (use gameId from message if provided, otherwise use current)
+            const gameId = event.data.gameId || this.currentGameId;
+            window.accountSystem.setGameSave(gameId, event.data.data);
         } else if (event.data.type === 'REQUEST_ACCOUNT_DATA') {
             // Send account data to iframe
             this.sendAccountDataToIframe();
@@ -477,6 +478,9 @@ class AccountSystem {
         const panel = document.getElementById('accountPanel');
         const body = document.getElementById('accountBody');
         
+        // Prevent body scrolling when panel is open
+        document.body.style.overflow = 'hidden';
+        
         if (this.currentUser) {
             this.showLoggedInView(body);
         } else {
@@ -484,10 +488,17 @@ class AccountSystem {
         }
         
         panel.classList.add('active');
+        
+        // Scroll panel to top when opened
+        panel.scrollTop = 0;
     }
     
     hideAccountPanel() {
-        document.getElementById('accountPanel').classList.remove('active');
+        const panel = document.getElementById('accountPanel');
+        panel.classList.remove('active');
+        
+        // Restore body scrolling when panel is closed
+        document.body.style.overflow = '';
     }
     
     showLoginView(container) {

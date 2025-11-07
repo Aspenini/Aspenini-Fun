@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="aspenini-game-id" content="space-tetris">
     <title>Space Tetris - Aspenini-Fun</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
@@ -10,7 +11,6 @@
 <body>
     <header class="topbar">
         <div class="topbar-left">
-            <a href="../../index.html" class="back-button" title="Back to Aspenini-Fun Hub">← Back to Hub</a>
             <h1>Space Tetris</h1>
         </div>
         <div class="controls-hint">
@@ -22,13 +22,6 @@
         <div class="game-area">
             <div class="game-board">
                 <canvas id="tetris" width="300" height="600"></canvas>
-                <div class="game-overlay" id="gameOverlay">
-                    <div class="overlay-content">
-                        <h2 id="overlayTitle">Space Tetris</h2>
-                        <p id="overlayMessage">Press SPACE or click START to begin your cosmic puzzle adventure!</p>
-                        <button id="startButton" class="game-btn">Start Game</button>
-                    </div>
-                </div>
             </div>
             
             <div class="next-piece">
@@ -38,9 +31,8 @@
         </div>
 
         <div class="game-info">
-            <div class="stats-panel">
-                <h3>Statistics</h3>
-                <div class="stat-grid">
+            <div class="instructions-panel">
+                <div class="stats-section">
                     <div class="stat">
                         <span class="stat-label">Score</span>
                         <span class="stat-value" id="score">0</span>
@@ -58,9 +50,12 @@
                         <span class="stat-value" id="bestScore">0</span>
                     </div>
                 </div>
-            </div>
 
-            <div class="controls-panel">
+                <div class="game-controls">
+                    <button id="gameButton" class="game-btn">Start</button>
+                    <button id="restartButton" class="game-btn secondary">Restart</button>
+                </div>
+
                 <h3>Controls</h3>
                 <div class="control-list">
                     <div class="control">
@@ -85,15 +80,10 @@
                     </div>
                 </div>
             </div>
-
-            <div class="game-controls">
-                <button id="pauseButton" class="game-btn secondary">Pause</button>
-                <button id="restartButton" class="game-btn secondary">Restart</button>
-            </div>
         </div>
     </main>
 
-    <script src="../account-bridge.js"></script>
+    <script src="../../aspenini-sdk.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

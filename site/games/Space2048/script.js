@@ -1,4 +1,4 @@
-// Space 2048 - Proper Implementation
+// Space 2048 - Complete Rewrite
 class Space2048 {
     constructor() {
         this.size = 4;
@@ -6,34 +6,19 @@ class Space2048 {
         this.score = 0;
         this.bestScore = parseInt(localStorage.getItem('space2048Best') || '0');
         this.gameStarted = false;
-        this.gameWon = false;
         this.gameOver = false;
-        this.animating = false;
-        this.previousBoard = [];
+        this.gameWon = false;
         
-        // Account system integration
-        this.accountData = null;
-        
-        // Achievement tracking
-        this.achievements = {
-            firstMove: { unlocked: false, title: "First Steps", desc: "Make your first move", icon: "👶" },
-            reach128: { unlocked: false, title: "Getting Warmer", desc: "Reach 128", icon: "🔥" },
-            reach512: { unlocked: false, title: "Half Way There", desc: "Reach 512", icon: "⭐" },
-            reach1024: { unlocked: false, title: "So Close!", desc: "Reach 1024", icon: "🚀" },
-            reach2048: { unlocked: false, title: "Space Champion!", desc: "Reach 2048", icon: "👑" },
-            score10k: { unlocked: false, title: "High Scorer", desc: "Score 10,000 points", icon: "💎" }
-        };
-        
-        this.loadAchievements();
-        this.setupAccountIntegration();
+        // Load save data using Aspenini SDK
+        this.loadSaveData();
         this.init();
     }
     
     init() {
         this.bindEvents();
         this.updateDisplay();
-        this.renderAchievements();
-        this.showOverlay();
+        this.startGame();
+        this.setupAutoSave();
     }
     
     bindEvents() {
@@ -41,7 +26,6 @@ class Space2048 {
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
         
         // Button controls
-        document.getElementById('startButton').addEventListener('click', () => this.startGame());
         document.getElementById('newGameBtn').addEventListener('click', () => this.startGame());
         
         // Touch controls for mobile
@@ -54,7 +38,7 @@ class Space2048 {
         });
         
         gameBoard.addEventListener('touchend', (e) => {
-            if (!startX || !startY) return;
+            if (!startX || !startY || !this.gameStarted || this.gameOver) return;
             
             const endX = e.changedTouches[0].clientX;
             const endY = e.changedTouches[0].clientY;
@@ -63,11 +47,15 @@ class Space2048 {
             const diffY = startY - endY;
             
             if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 50) this.move('left');
-                else if (diffX < -50) this.move('right');
+                if (Math.abs(diffX) > 30) {
+                    if (diffX > 0) this.move('left');
+                    else this.move('right');
+                }
             } else {
-                if (diffY > 50) this.move('up');
-                else if (diffY < -50) this.move('down');
+                if (Math.abs(diffY) > 30) {
+                    if (diffY > 0) this.move('up');
+                    else this.move('down');
+                }
             }
             
             startX = startY = null;
@@ -75,32 +63,30 @@ class Space2048 {
     }
     
     handleKeyPress(e) {
-        if (!this.gameStarted || this.gameOver) {
-            if (e.code === 'Space' || e.code === 'Enter') {
-                this.startGame();
-            }
-            return;
-        }
+        if (!this.gameStarted || this.gameOver) return;
         
         switch (e.code) {
             case 'ArrowLeft':
             case 'KeyA':
+                e.preventDefault();
                 this.move('left');
                 break;
             case 'ArrowRight':
             case 'KeyD':
+                e.preventDefault();
                 this.move('right');
                 break;
             case 'ArrowUp':
             case 'KeyW':
+                e.preventDefault();
                 this.move('up');
                 break;
             case 'ArrowDown':
             case 'KeyS':
+                e.preventDefault();
                 this.move('down');
                 break;
         }
-        e.preventDefault();
     }
     
     startGame() {
@@ -114,7 +100,6 @@ class Space2048 {
         this.addRandomTile();
         this.addRandomTile();
         
-        this.hideOverlay();
         this.updateDisplay();
         this.renderBoard();
     }
@@ -142,7 +127,7 @@ class Space2048 {
     }
     
     move(direction) {
-        if (!this.gameStarted || this.gameOver || this.animating) return;
+        if (!this.gameStarted || this.gameOver) return;
         
         const oldBoard = this.board.map(row => [...row]);
         let moved = false;
@@ -163,16 +148,10 @@ class Space2048 {
         }
         
         if (moved) {
-            this.animating = true;
-            // Animate the move
-            this.animateMove(oldBoard, this.board, direction, () => {
-                this.addRandomTile();
-                this.updateDisplay();
-                this.renderBoard();
-                this.checkAchievements();
-                this.checkGameStatus();
-                this.animating = false;
-            });
+            this.addRandomTile();
+            this.updateDisplay();
+            this.renderBoard();
+            this.checkGameStatus();
         }
     }
     
@@ -181,27 +160,30 @@ class Space2048 {
         
         for (let i = 0; i < this.size; i++) {
             const row = this.board[i].filter(val => val !== 0);
+            const newRow = [];
             
             // Merge adjacent equal tiles
-            for (let j = 0; j < row.length - 1; j++) {
-                if (row[j] === row[j + 1]) {
-                    row[j] *= 2;
-                    this.score += row[j];
-                    row.splice(j + 1, 1);
+            for (let j = 0; j < row.length; j++) {
+                if (j < row.length - 1 && row[j] === row[j + 1]) {
+                    newRow.push(row[j] * 2);
+                    this.score += row[j] * 2;
+                    j++; // Skip next tile as it's merged
+                } else {
+                    newRow.push(row[j]);
                 }
             }
             
             // Pad with zeros
-            while (row.length < this.size) {
-                row.push(0);
+            while (newRow.length < this.size) {
+                newRow.push(0);
             }
             
             // Check if anything changed
             for (let j = 0; j < this.size; j++) {
-                if (this.board[i][j] !== row[j]) {
+                if (this.board[i][j] !== newRow[j]) {
                     moved = true;
                 }
-                this.board[i][j] = row[j];
+                this.board[i][j] = newRow[j];
             }
         }
         
@@ -213,27 +195,30 @@ class Space2048 {
         
         for (let i = 0; i < this.size; i++) {
             const row = this.board[i].filter(val => val !== 0);
+            const newRow = [];
             
             // Merge adjacent equal tiles (from right)
-            for (let j = row.length - 1; j > 0; j--) {
-                if (row[j] === row[j - 1]) {
-                    row[j] *= 2;
-                    this.score += row[j];
-                    row.splice(j - 1, 1);
+            for (let j = row.length - 1; j >= 0; j--) {
+                if (j > 0 && row[j] === row[j - 1]) {
+                    newRow.unshift(row[j] * 2);
+                    this.score += row[j] * 2;
+                    j--; // Skip next tile as it's merged
+                } else {
+                    newRow.unshift(row[j]);
                 }
             }
             
             // Pad with zeros at the beginning
-            while (row.length < this.size) {
-                row.unshift(0);
+            while (newRow.length < this.size) {
+                newRow.unshift(0);
             }
             
             // Check if anything changed
             for (let j = 0; j < this.size; j++) {
-                if (this.board[i][j] !== row[j]) {
+                if (this.board[i][j] !== newRow[j]) {
                     moved = true;
                 }
-                this.board[i][j] = row[j];
+                this.board[i][j] = newRow[j];
             }
         }
         
@@ -253,26 +238,30 @@ class Space2048 {
                 }
             }
             
+            const newColumn = [];
+            
             // Merge adjacent equal tiles
-            for (let i = 0; i < column.length - 1; i++) {
-                if (column[i] === column[i + 1]) {
-                    column[i] *= 2;
-                    this.score += column[i];
-                    column.splice(i + 1, 1);
+            for (let i = 0; i < column.length; i++) {
+                if (i < column.length - 1 && column[i] === column[i + 1]) {
+                    newColumn.push(column[i] * 2);
+                    this.score += column[i] * 2;
+                    i++; // Skip next tile as it's merged
+                } else {
+                    newColumn.push(column[i]);
                 }
             }
             
             // Pad with zeros
-            while (column.length < this.size) {
-                column.push(0);
+            while (newColumn.length < this.size) {
+                newColumn.push(0);
             }
             
             // Update board
             for (let i = 0; i < this.size; i++) {
-                if (this.board[i][j] !== column[i]) {
+                if (this.board[i][j] !== newColumn[i]) {
                     moved = true;
                 }
-                this.board[i][j] = column[i];
+                this.board[i][j] = newColumn[i];
             }
         }
         
@@ -292,26 +281,30 @@ class Space2048 {
                 }
             }
             
+            const newColumn = [];
+            
             // Merge adjacent equal tiles (from bottom)
-            for (let i = column.length - 1; i > 0; i--) {
-                if (column[i] === column[i - 1]) {
-                    column[i] *= 2;
-                    this.score += column[i];
-                    column.splice(i - 1, 1);
+            for (let i = column.length - 1; i >= 0; i--) {
+                if (i > 0 && column[i] === column[i - 1]) {
+                    newColumn.unshift(column[i] * 2);
+                    this.score += column[i] * 2;
+                    i--; // Skip next tile as it's merged
+                } else {
+                    newColumn.unshift(column[i]);
                 }
             }
             
             // Pad with zeros at the beginning
-            while (column.length < this.size) {
-                column.unshift(0);
+            while (newColumn.length < this.size) {
+                newColumn.unshift(0);
             }
             
             // Update board
             for (let i = 0; i < this.size; i++) {
-                if (this.board[i][j] !== column[i]) {
+                if (this.board[i][j] !== newColumn[i]) {
                     moved = true;
                 }
-                this.board[i][j] = column[i];
+                this.board[i][j] = newColumn[i];
             }
         }
         
@@ -320,14 +313,16 @@ class Space2048 {
     
     checkGameStatus() {
         // Check for win condition
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                if (this.board[i][j] >= 2048) {
-                    if (!this.gameWon) {
+        if (!this.gameWon) {
+            for (let i = 0; i < this.size; i++) {
+                for (let j = 0; j < this.size; j++) {
+                    if (this.board[i][j] >= 2048) {
                         this.gameWon = true;
                         this.showInGameMessage('🎉 You reached 2048! 🎉', 'success');
+                        break;
                     }
                 }
+                if (this.gameWon) break;
             }
         }
         
@@ -366,114 +361,13 @@ class Space2048 {
         return true;
     }
     
-    animateMove(oldBoard, newBoard, direction, callback) {
-        const gameBoard = document.getElementById('gameBoard');
-        const animationDuration = 150;
-        
-        // Create animated tiles
-        const animatingTiles = [];
-        
-        // Find tiles that moved or merged
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                const oldValue = oldBoard[i][j];
-                const newValue = newBoard[i][j];
-                
-                if (oldValue !== 0) {
-                    // Find where this tile ended up
-                    const destination = this.findTileDestination(oldBoard, newBoard, i, j, direction);
-                    
-                    if (destination && (destination.row !== i || destination.col !== j)) {
-                        // Create animated tile
-                        const tile = document.createElement('div');
-                        tile.className = 'tile animated-tile';
-                        tile.textContent = oldValue;
-                        tile.setAttribute('data-value', oldValue);
-                        
-                        // Position at starting location
-                        const startRow = i;
-                        const startCol = j;
-                        const endRow = destination.row;
-                        const endCol = destination.col;
-                        
-                        tile.style.gridRow = startRow + 1;
-                        tile.style.gridColumn = startCol + 1;
-                        tile.style.zIndex = '100';
-                        
-                        gameBoard.appendChild(tile);
-                        
-                        // Animate to destination
-                        requestAnimationFrame(() => {
-                            tile.style.gridRow = endRow + 1;
-                            tile.style.gridColumn = endCol + 1;
-                            
-                            // Handle merged tiles
-                            if (oldValue !== newValue && newValue > oldValue) {
-                                setTimeout(() => {
-                                    tile.textContent = newValue;
-                                    tile.setAttribute('data-value', newValue);
-                                }, animationDuration / 2);
-                            }
-                        });
-                        
-                        animatingTiles.push(tile);
-                    }
-                }
-            }
-        }
-        
-        // Clean up after animation
-        setTimeout(() => {
-            animatingTiles.forEach(tile => {
-                if (tile.parentNode) {
-                    tile.parentNode.removeChild(tile);
-                }
-            });
-            callback();
-        }, animationDuration);
-    }
-    
-    findTileDestination(oldBoard, newBoard, oldRow, oldCol, direction) {
-        const oldValue = oldBoard[oldRow][oldCol];
-        
-        // Find where this tile value appears in the new board
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                if (newBoard[i][j] === oldValue || newBoard[i][j] === oldValue * 2) {
-                    // Check if this is a valid destination based on direction
-                    if (this.isValidDestination(oldRow, oldCol, i, j, direction)) {
-                        // Mark as used to avoid duplicate matching
-                        newBoard[i][j] = -1;
-                        return { row: i, col: j };
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    
-    isValidDestination(oldRow, oldCol, newRow, newCol, direction) {
-        switch (direction) {
-            case 'left':
-                return oldRow === newRow && newCol <= oldCol;
-            case 'right':
-                return oldRow === newRow && newCol >= oldCol;
-            case 'up':
-                return oldCol === newCol && newRow <= oldRow;
-            case 'down':
-                return oldCol === newCol && newRow >= oldRow;
-            default:
-                return false;
-        }
-    }
-    
     renderBoard() {
         const gameBoard = document.getElementById('gameBoard');
         
         // Clear the board
         gameBoard.innerHTML = '';
         
-        // Create grid cells
+        // Create grid cells and tiles
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
                 const cell = document.createElement('div');
@@ -482,23 +376,9 @@ class Space2048 {
                 const value = this.board[i][j];
                 if (value !== 0) {
                     const tile = document.createElement('div');
-                    tile.className = 'tile';
+                    tile.className = 'tile new';
                     tile.textContent = value;
                     tile.setAttribute('data-value', value);
-                    
-                    // Add animation classes for new tiles
-                    if (this.previousBoard && this.previousBoard.length > 0) {
-                        const oldValue = this.previousBoard[i][j];
-                        if (oldValue === 0) {
-                            tile.classList.add('new');
-                        } else if (oldValue !== value && value > oldValue) {
-                            tile.classList.add('merged');
-                        }
-                    } else {
-                        // Initial tiles
-                        tile.classList.add('new');
-                    }
-                    
                     cell.appendChild(tile);
                 }
                 
@@ -506,8 +386,12 @@ class Space2048 {
             }
         }
         
-        // Store current board state for next render
-        this.previousBoard = this.board.map(row => [...row]);
+        // Remove 'new' class after animation
+        setTimeout(() => {
+            document.querySelectorAll('.tile.new').forEach(tile => {
+                tile.classList.remove('new');
+            });
+        }, 200);
     }
     
     updateDisplay() {
@@ -516,38 +400,10 @@ class Space2048 {
         if (this.score > this.bestScore) {
             this.bestScore = this.score;
             localStorage.setItem('space2048Best', this.bestScore.toString());
+            this.saveGameData();
         }
         
         document.getElementById('bestScore').textContent = this.bestScore.toLocaleString();
-    }
-    
-    checkAchievements() {
-        const maxTile = Math.max(...this.board.flat());
-        
-        // Check tile-based achievements
-        if (maxTile >= 128 && !this.achievements.reach128.unlocked) {
-            this.unlockAchievement('reach128');
-        }
-        if (maxTile >= 512 && !this.achievements.reach512.unlocked) {
-            this.unlockAchievement('reach512');
-        }
-        if (maxTile >= 1024 && !this.achievements.reach1024.unlocked) {
-            this.unlockAchievement('reach1024');
-        }
-        if (maxTile >= 2048 && !this.achievements.reach2048.unlocked) {
-            this.unlockAchievement('reach2048');
-        }
-        
-        // Check score-based achievements
-        if (this.score >= 10000 && !this.achievements.score10k.unlocked) {
-            this.unlockAchievement('score10k');
-        }
-    }
-    
-    unlockAchievement(id) {
-        this.achievements[id].unlocked = true;
-        this.saveAchievements();
-        this.renderAchievements();
     }
     
     showInGameMessage(message, type = 'info') {
@@ -571,112 +427,33 @@ class Space2048 {
         }, 3000);
     }
     
-    renderAchievements() {
-        const achievementsList = document.getElementById('achievements');
-        achievementsList.innerHTML = '';
-        
-        Object.entries(this.achievements).forEach(([id, achievement]) => {
-            const achievementEl = document.createElement('div');
-            achievementEl.className = `achievement ${achievement.unlocked ? 'unlocked' : ''}`;
-            
-            achievementEl.innerHTML = `
-                <div class="achievement-icon">${achievement.unlocked ? achievement.icon : '🔒'}</div>
-                <div class="achievement-text">
-                    <div class="achievement-title">${achievement.title}</div>
-                    <div class="achievement-desc">${achievement.desc}</div>
-                </div>
-            `;
-            
-            achievementsList.appendChild(achievementEl);
-        });
-    }
-    
-    saveAchievements() {
-        localStorage.setItem('space2048Achievements', JSON.stringify(this.achievements));
-    }
-    
-    loadAchievements() {
-        const saved = localStorage.getItem('space2048Achievements');
-        if (saved) {
-            const savedAchievements = JSON.parse(saved);
-            Object.keys(this.achievements).forEach(key => {
-                if (savedAchievements[key]) {
-                    this.achievements[key].unlocked = savedAchievements[key].unlocked;
+    loadSaveData() {
+        if (window.Aspenini) {
+            const saveData = window.Aspenini.load();
+            if (saveData && saveData.bestScore) {
+                if (saveData.bestScore > this.bestScore) {
+                    this.bestScore = saveData.bestScore;
+                    localStorage.setItem('space2048Best', this.bestScore.toString());
                 }
-            });
+            }
+        } else {
+            window.addEventListener('aspenini:ready', () => {
+                this.loadSaveData();
+            }, { once: true });
         }
     }
     
-    showOverlay(title = 'Space 2048', message = 'Slide tiles to combine numbers and reach 2048!', buttons = [{ text: 'Start Game', action: () => this.startGame() }]) {
-        document.getElementById('overlayTitle').textContent = title;
-        document.getElementById('overlayMessage').textContent = message;
-        
-        const buttonsContainer = document.querySelector('.overlay-buttons');
-        buttonsContainer.innerHTML = '';
-        
-        buttons.forEach(button => {
-            const btn = document.createElement('button');
-            btn.className = 'game-btn';
-            btn.textContent = button.text;
-            btn.addEventListener('click', button.action);
-            buttonsContainer.appendChild(btn);
-        });
-        
-        document.getElementById('gameOverlay').classList.remove('hidden');
-    }
-    
-    hideOverlay() {
-        document.getElementById('gameOverlay').classList.add('hidden');
-    }
-    
-    setupAccountIntegration() {
-        // Listen for account data from the bridge
-        window.addEventListener('accountDataLoaded', (event) => {
-            this.accountData = event.detail;
-            this.loadFromAccount();
-        });
-        
-        // Try to load immediately if already available
-        setTimeout(() => {
-            this.loadFromAccount();
-        }, 100);
-        
-        // Auto-save to account every 5 seconds
+    setupAutoSave() {
         setInterval(() => {
-            this.saveToAccount();
+            this.saveGameData();
         }, 5000);
     }
     
-    saveToAccount() {
-        const saveData = {
-            bestScore: this.bestScore,
-            achievements: this.achievements
-        };
-        
-        if (window.saveToAccount) {
-            window.saveToAccount(saveData);
-        }
-    }
-    
-    loadFromAccount() {
-        const accountSave = window.loadFromAccount();
-        if (accountSave) {
-            if (accountSave.bestScore && accountSave.bestScore > this.bestScore) {
-                this.bestScore = accountSave.bestScore;
-                localStorage.setItem('space2048Best', this.bestScore.toString());
-            }
-            
-            if (accountSave.achievements) {
-                Object.keys(this.achievements).forEach(key => {
-                    if (accountSave.achievements[key]) {
-                        this.achievements[key].unlocked = accountSave.achievements[key].unlocked;
-                    }
-                });
-                this.renderAchievements();
-            }
-            
-            this.updateDisplay();
-            console.log('Loaded Space 2048 save from account system');
+    saveGameData() {
+        if (window.Aspenini) {
+            window.Aspenini.save({
+                bestScore: this.bestScore
+            });
         }
     }
 }

@@ -606,17 +606,20 @@ body::before {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(15, 15, 35, 0.9);
     backdrop-filter: blur(10px);
-    z-index: 10000;
+    z-index: 99999;
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
 }
 
 .account-panel.active {
@@ -631,10 +634,15 @@ body::before {
     padding: 0;
     max-width: 500px;
     width: 90%;
-    max-height: 80vh;
+    max-height: 90vh;
     overflow: hidden;
     backdrop-filter: blur(15px);
     box-shadow: 0 20px 60px rgba(138, 119, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 0;
+    transform: translate(0, 0);
 }
 
 .account-header {
@@ -676,7 +684,9 @@ body::before {
 .account-body {
     padding: 30px;
     overflow-y: auto;
-    max-height: 60vh;
+    overflow-x: hidden;
+    flex: 1;
+    min-height: 0;
 }
 
 .account-form {

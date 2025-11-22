@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1763517558|4416609228';
+const CACHE_VERSION = '1763771686|125478738';
 /** @type {string} */
 const CACHE_PREFIX = 'Rutted-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
@@ -17,7 +17,7 @@ const ENSURE_CROSSORIGIN_ISOLATION_HEADERS = true;
 const CACHED_FILES = ["rutted.html","rutted.js","rutted.offline.html","rutted.icon.png","rutted.apple-touch-icon.png","rutted.audio.worklet.js","rutted.audio.position.worklet.js"];
 // Files that we might not want the user to preload, and will only be cached on first load.
 /** @type {string[]} */
-const CACHEABLE_FILES = ["rutted.wasm","rutted.pck","rutted.side.wasm"];
+const CACHEABLE_FILES = ["rutted.wasm","rutted.pck"];
 const FULL_CACHE = CACHED_FILES.concat(CACHEABLE_FILES);
 
 self.addEventListener('install', (event) => {

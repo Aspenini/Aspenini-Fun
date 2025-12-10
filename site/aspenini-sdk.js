@@ -72,7 +72,7 @@ class AspeniniSDK {
     }
 
     setupIframeMode() {
-        // Listen for account data from parent hub
+        // Listen for account data and theme from parent hub
         window.addEventListener('message', (event) => {
             if (event.data.type === 'ACCOUNT_DATA') {
                 this.accountData = event.data.data;
@@ -82,11 +82,15 @@ class AspeniniSDK {
                 window.dispatchEvent(new CustomEvent('aspenini:ready', {
                     detail: this.accountData
                 }));
+            } else if (event.data.type === 'THEME_UPDATE') {
+                // Apply theme to game
+                this.applyTheme(event.data.theme);
             }
         });
 
-        // Request account data on load
+        // Request account data and theme on load
         this.requestAccountData();
+        this.requestTheme();
         
         // Add inline mode class to body
         document.body.classList.add('aspenini-inline-mode');
@@ -112,6 +116,22 @@ class AspeniniSDK {
             window.parent.postMessage({
                 type: 'REQUEST_ACCOUNT_DATA'
             }, '*');
+        }
+    }
+
+    requestTheme() {
+        if (this.isInIframe && window.parent) {
+            window.parent.postMessage({
+                type: 'REQUEST_THEME'
+            }, '*');
+        }
+    }
+
+    applyTheme(themeId) {
+        if (!themeId || themeId === 'deep-space') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', themeId);
         }
     }
 

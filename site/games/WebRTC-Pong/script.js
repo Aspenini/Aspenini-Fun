@@ -297,7 +297,6 @@ class PongGame {
             
             // Set up connection state monitoring
             this.pc.oniceconnectionstatechange = () => {
-                console.log('ICE connection state:', this.pc.iceConnectionState);
                 if (this.pc.iceConnectionState === 'connected') {
                     this.state = 'connected';
                     this.isConnected = true;
@@ -336,7 +335,6 @@ class PongGame {
             
             // Set up connection state monitoring
             this.pc.oniceconnectionstatechange = () => {
-                console.log('ICE connection state:', this.pc.iceConnectionState);
                 if (this.pc.iceConnectionState === 'connected') {
                     this.state = 'connected';
                     this.isConnected = true;
@@ -376,7 +374,6 @@ class PongGame {
         this.dataChannel = channel;
         
         this.dataChannel.onopen = () => {
-            console.log('Data channel opened');
             this.state = 'connected';
             this.isConnected = true;
             this.updateStatus();
@@ -389,7 +386,6 @@ class PongGame {
         };
         
         this.dataChannel.onclose = () => {
-            console.log('Data channel closed');
             this.state = 'disconnected';
             this.isConnected = false;
             this.updateStatus();

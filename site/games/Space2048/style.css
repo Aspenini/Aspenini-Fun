@@ -28,10 +28,14 @@ body {
     background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 35%, #0f0f23 100%);
     background-attachment: fixed;
     min-height: 100vh;
-    color: #e8e8ff;
+    color: var(--text-primary);
     /* Chromebook optimizations */
     -webkit-font-smoothing: antialiased;
     transform: translateZ(0);
+}
+
+body.aspenini-inline-mode {
+    background: transparent;
 }
 
 /* Add subtle stars background */
@@ -57,11 +61,11 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
-    background: rgba(138, 119, 255, 0.1);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(138, 119, 255, 0.2);
-    box-shadow: 0 2px 10px rgba(138, 119, 255, 0.1);
+    padding: 20px 30px;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px var(--glow-secondary);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -76,16 +80,24 @@ body::before {
 .topbar h1 {
     font-family: 'Orbitron', monospace;
     font-size: 1.8rem;
-    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    font-weight: 700;
+    background: var(--accent-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(138, 119, 255, 0.3);
+    text-shadow: 0 0 20px var(--glow-color);
+    margin: 0;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .controls-hint {
     font-size: 0.9rem;
-    color: #b8b8ff;
+    color: var(--text-secondary);
     opacity: 0.8;
 }
 
@@ -135,7 +147,7 @@ body.aspenini-inline-mode .game-container {
 
 .instructions-panel {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
-    border: 1px solid rgba(138, 119, 255, 0.15);
+    border: 1px solid var(--border-color);
     border-radius: 15px;
     padding: clamp(16px, 2vw, 24px);
     backdrop-filter: blur(8px);
@@ -153,10 +165,10 @@ body.aspenini-inline-mode .game-container {
 
 .instructions-panel h3 {
     font-family: 'Orbitron', monospace;
-    color: #8a77ff;
+    color: var(--accent-primary);
     margin-bottom: clamp(12px, 1.5vw, 20px);
     font-size: clamp(1.2rem, 2vw, 1.6rem);
-    text-shadow: 0 0 10px rgba(138, 119, 255, 0.3);
+    text-shadow: 0 0 10px var(--glow-color);
 }
 
 .game-controls {
@@ -169,7 +181,7 @@ body.aspenini-inline-mode .game-container {
 
 .stat {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
-    border: 1px solid rgba(138, 119, 255, 0.15);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 15px 20px;
     text-align: center;
@@ -188,7 +200,7 @@ body.aspenini-inline-mode .game-container {
     display: block;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #8a77ff;
+    color: var(--accent-primary);
     font-family: 'Orbitron', monospace;
 }
 
@@ -395,7 +407,7 @@ body.aspenini-inline-mode .game-container {
 
 .instructions-panel {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
-    border: 1px solid rgba(138, 119, 255, 0.15);
+    border: 1px solid var(--border-color);
     border-radius: 15px;
     padding: 25px;
     backdrop-filter: blur(8px);
@@ -404,9 +416,9 @@ body.aspenini-inline-mode .game-container {
 
 .instructions-panel h3 {
     font-family: 'Orbitron', monospace;
-    color: #8a77ff;
+    color: var(--accent-primary);
     margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(138, 119, 255, 0.3);
+    text-shadow: 0 0 10px var(--glow-color);
 }
 
 .controls-grid {
@@ -423,13 +435,13 @@ body.aspenini-inline-mode .game-container {
     padding: 8px 12px;
     background: rgba(138, 119, 255, 0.1);
     border-radius: 8px;
-    border: 1px solid rgba(138, 119, 255, 0.15);
+    border: 1px solid var(--border-color);
 }
 
 .key {
     font-family: 'Orbitron', monospace;
     font-weight: 700;
-    color: #8a77ff;
+    color: var(--accent-primary);
     background: rgba(138, 119, 255, 0.2);
     padding: 4px 8px;
     border-radius: 6px;
@@ -446,7 +458,7 @@ body.aspenini-inline-mode .game-container {
 }
 
 .tips h4 {
-    color: #8a77ff;
+    color: var(--accent-primary);
     margin-bottom: 10px;
     font-family: 'Orbitron', monospace;
 }
@@ -465,7 +477,7 @@ body.aspenini-inline-mode .game-container {
 
 .tips li::before {
     content: '▸';
-    color: #8a77ff;
+    color: var(--accent-primary);
     position: absolute;
     left: 0;
 }

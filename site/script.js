@@ -10,29 +10,24 @@ class GameHub {
         this.init();
     }
 
-    init() {
+    async init() {
         this.showLoading();
         
         // Use requestIdleCallback for better performance on low-end devices
+        const initializeHub = async () => {
+            await this.loadGames();
+            this.renderGames();
+            this.updateStats();
+            this.hideLoading();
+            this.addEventListeners();
+            this.initRouting();
+        };
+        
         if (window.requestIdleCallback) {
-            window.requestIdleCallback(() => {
-                this.loadGames();
-                this.renderGames();
-                this.updateStats();
-                this.hideLoading();
-                this.addEventListeners();
-                this.initRouting();
-            });
+            window.requestIdleCallback(() => initializeHub());
         } else {
             // Fallback for browsers that don't support requestIdleCallback
-            setTimeout(() => {
-                this.loadGames();
-                this.renderGames();
-                this.updateStats();
-                this.hideLoading();
-                this.addEventListeners();
-                this.initRouting();
-            }, 100);
+            setTimeout(() => initializeHub(), 100);
         }
     }
 
@@ -115,19 +110,28 @@ class GameHub {
         this.loadingOverlay.classList.remove('active');
     }
 
-    loadGames() {
+    async loadGames() {
         try {
-            console.log('Loading games from embedded HTML data...');
+            // Try to fetch from external file first
+            try {
+                const response = await fetch('games.json');
+                if (response.ok) {
+                    this.games = await response.json();
+                    return;
+                }
+            } catch (fetchError) {
+                // Fallback to embedded data for file:// protocol
+            }
+            
+            // Fallback to embedded data for file:// protocol
             const gamesScript = document.getElementById('games-data');
             if (gamesScript) {
                 this.games = JSON.parse(gamesScript.textContent);
-                console.log('Games loaded successfully:', this.games);
             } else {
-                console.log('No games data found - no games available');
                 this.games = [];
             }
         } catch (error) {
-            console.log('Could not parse games data:', error.message);
+            console.warn('Could not load games:', error.message);
             this.games = [];
         }
     }
@@ -140,10 +144,7 @@ class GameHub {
     }
 
     renderGames() {
-        console.log('Rendering games. Count:', this.games.length);
-        
         if (this.games.length === 0) {
-            console.log('No games found, showing no games message');
             this.renderNoGames();
             return;
         }
@@ -153,14 +154,12 @@ class GameHub {
         // Use document fragment for better performance
         const fragment = document.createDocumentFragment();
         
-        this.games.forEach((game, index) => {
-            console.log(`Creating card for game ${index + 1}:`, game.title);
+        this.games.forEach((game) => {
             const gameCard = this.createGameCard(game);
             fragment.appendChild(gameCard);
         });
         
         this.gamesGrid.appendChild(fragment);
-        console.log('Games rendered successfully');
     }
 
     createGameCard(game) {
@@ -311,6 +310,9 @@ class GameHub {
         } else if (event.data.type === 'REQUEST_ACCOUNT_DATA') {
             // Send account data to iframe
             this.sendAccountDataToIframe();
+        } else if (event.data.type === 'REQUEST_THEME') {
+            // Send current theme to iframe
+            this.sendThemeToIframe();
         }
     }
 
@@ -325,6 +327,19 @@ class GameHub {
             gameFrame.contentWindow.postMessage({
                 type: 'ACCOUNT_DATA',
                 data: accountData
+            }, '*');
+            
+            // Also send current theme
+            this.sendThemeToIframe();
+        }
+    }
+
+    sendThemeToIframe() {
+        const gameFrame = document.getElementById('gameFrame');
+        if (gameFrame.contentWindow && window.themeSystem) {
+            gameFrame.contentWindow.postMessage({
+                type: 'THEME_UPDATE',
+                theme: window.themeSystem.currentTheme
             }, '*');
         }
     }
@@ -439,12 +454,166 @@ class GameHub {
 
 
     // Method to refresh the game list
-    refresh() {
+    async refresh() {
         this.showLoading();
-        this.loadGames();
+        await this.loadGames();
         this.renderGames();
         this.updateStats();
         this.hideLoading();
+    }
+}
+
+// Theme System
+class ThemeSystem {
+    constructor() {
+        this.themes = [
+            { id: 'deep-space', name: 'Deep Space', default: true },
+            { id: 'cosmic-blue', name: 'Cosmic Blue' },
+            { id: 'aurora-green', name: 'Aurora Green' },
+            { id: 'solar-red', name: 'Solar Red' },
+            { id: 'nebula-pink', name: 'Nebula Pink' },
+            { id: 'midnight-cyan', name: 'Midnight Cyan' },
+            { id: 'dark-matter', name: 'Dark Matter' }
+        ];
+        this.currentTheme = 'deep-space';
+        this.init();
+    }
+    
+    init() {
+        this.loadTheme();
+        this.bindEvents();
+    }
+    
+    bindEvents() {
+        document.getElementById('themeBtn').addEventListener('click', () => this.showThemePanel());
+        document.getElementById('closeThemePanel').addEventListener('click', () => this.hideThemePanel());
+        
+        // Close panel when clicking outside
+        document.getElementById('themePanel').addEventListener('click', (e) => {
+            if (e.target.id === 'themePanel') {
+                this.hideThemePanel();
+            }
+        });
+        
+        // ESC key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('themePanel').classList.contains('active')) {
+                this.hideThemePanel();
+            }
+        });
+    }
+    
+    showThemePanel() {
+        const panel = document.getElementById('themePanel');
+        const grid = document.getElementById('themeGrid');
+        
+        // Prevent body scrolling
+        document.body.style.overflow = 'hidden';
+        
+        // Render theme options
+        this.renderThemes(grid);
+        
+        panel.classList.add('active');
+    }
+    
+    hideThemePanel() {
+        const panel = document.getElementById('themePanel');
+        panel.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    renderThemes(container) {
+        container.innerHTML = '';
+        
+        this.themes.forEach(theme => {
+            const option = document.createElement('div');
+            option.className = 'theme-option';
+            if (theme.id === this.currentTheme) {
+                option.classList.add('active');
+            }
+            
+            option.innerHTML = `
+                <div class="theme-preview" data-theme="${theme.id}">
+                    <div style="width: 100%; height: 100%; background: ${this.getThemePreview(theme.id)};"></div>
+                </div>
+                <div class="theme-name">${theme.name}</div>
+            `;
+            
+            option.addEventListener('click', () => this.setTheme(theme.id));
+            container.appendChild(option);
+        });
+    }
+    
+    getThemePreview(themeId) {
+        const previews = {
+            'deep-space': 'linear-gradient(135deg, #8a77ff, #4c9aff, #00d4ff)',
+            'cosmic-blue': 'linear-gradient(135deg, #00b4ff, #0091ea, #00e5ff)',
+            'aurora-green': 'linear-gradient(135deg, #00ff88, #00cc6f, #00ffaa)',
+            'solar-red': 'linear-gradient(135deg, #ff4444, #ff6b6b, #ff8888)',
+            'nebula-pink': 'linear-gradient(135deg, #ff6ec7, #ff49b3, #ff8cd6)',
+            'midnight-cyan': 'linear-gradient(135deg, #00d4d4, #00b3b3, #00e5e5)',
+            'dark-matter': 'linear-gradient(135deg, #ffffff, #dddddd, #f5f5f5)'
+        };
+        return previews[themeId] || previews['deep-space'];
+    }
+    
+    setTheme(themeId) {
+        // Apply theme to document
+        if (themeId === 'deep-space') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', themeId);
+        }
+        
+        this.currentTheme = themeId;
+        this.saveTheme();
+        
+        // Update UI
+        const grid = document.getElementById('themeGrid');
+        this.renderThemes(grid);
+        
+        // Send theme to currently open game
+        if (window.gameHub) {
+            window.gameHub.sendThemeToIframe();
+        }
+        
+        // Visual feedback
+        this.showThemeChangeEffect();
+    }
+    
+    showThemeChangeEffect() {
+        // Brief flash effect
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 99999;
+            animation: themeFlash 0.5s ease-out;
+        `;
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => {
+            document.body.removeChild(overlay);
+        }, 500);
+    }
+    
+    saveTheme() {
+        localStorage.setItem('aspeniniTheme', this.currentTheme);
+    }
+    
+    loadTheme() {
+        const saved = localStorage.getItem('aspeniniTheme');
+        if (saved && this.themes.find(t => t.id === saved)) {
+            this.currentTheme = saved;
+            if (saved !== 'deep-space') {
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+        }
     }
 }
 
@@ -814,8 +983,9 @@ class AccountSystem {
     }
 }
 
-// Initialize the game hub and account system when the DOM is loaded
+// Initialize the game hub, theme system, and account system when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    window.themeSystem = new ThemeSystem();
     window.gameHub = new GameHub();
     window.accountSystem = new AccountSystem();
 });

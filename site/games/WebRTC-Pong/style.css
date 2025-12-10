@@ -10,8 +10,12 @@ body {
     background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 35%, #0f0f23 100%);
     background-attachment: fixed;
     min-height: 100vh;
-    color: #e8e8ff;
+    color: var(--text-primary);
     overflow-x: hidden;
+}
+
+body.aspenini-inline-mode {
+    background: transparent;
 }
 
 /* Starfield effect */
@@ -44,15 +48,25 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 20px;
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.4), rgba(22, 33, 62, 0.3));
-    border-radius: 15px;
-    margin-bottom: 20px;
+    padding: 20px 30px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(138, 119, 255, 0.2);
+    box-shadow: 0 2px 10px var(--glow-secondary);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin-bottom: 0;
+    border-radius: 0;
 }
 
 .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-right {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -77,13 +91,16 @@ body.aspenini-inline-mode .container {
     padding: 0;
 }
 
-h1 {
+.topbar h1 {
     font-family: 'Orbitron', monospace;
-    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--accent-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 1.5rem;
+    text-shadow: 0 0 20px var(--glow-color);
+    margin: 0;
 }
 
 .status {
@@ -106,21 +123,21 @@ h1 {
     padding: 40px;
     text-align: center;
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(138, 119, 255, 0.2);
+    border: 1px solid var(--border-color);
 }
 
 .connection-panel h2 {
     font-family: 'Orbitron', monospace;
     font-size: 2rem;
     margin-bottom: 10px;
-    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    background: var(--accent-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .description {
-    color: #b8b8ff;
+    color: var(--text-secondary);
     margin-bottom: 30px;
     font-size: 0.95rem;
 }
@@ -135,9 +152,9 @@ h1 {
 .mode-btn {
     padding: 12px 30px;
     background: rgba(138, 119, 255, 0.1);
-    border: 2px solid rgba(138, 119, 255, 0.3);
+    border: 2px solid var(--border-color-hover);
     border-radius: 25px;
-    color: #e8e8ff;
+    color: var(--text-primary);
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
@@ -147,12 +164,12 @@ h1 {
 
 .mode-btn:hover {
     background: rgba(138, 119, 255, 0.2);
-    border-color: rgba(138, 119, 255, 0.5);
+    border-color: var(--accent-primary);
     transform: translateY(-2px);
 }
 
 .mode-btn.active {
-    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    background: var(--accent-gradient);
     border-color: transparent;
     box-shadow: 0 4px 20px rgba(138, 119, 255, 0.4);
 }
@@ -163,7 +180,7 @@ h1 {
 
 .info-box {
     background: rgba(15, 15, 35, 0.5);
-    border: 1px solid rgba(138, 119, 255, 0.2);
+    border: 1px solid var(--border-color);
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 20px;
@@ -187,7 +204,7 @@ textarea {
     border: 1px solid rgba(138, 119, 255, 0.3);
     border-radius: 10px;
     padding: 15px;
-    color: #e8e8ff;
+    color: var(--text-primary);
     font-family: monospace;
     font-size: 0.85rem;
     resize: vertical;
@@ -201,7 +218,7 @@ textarea::placeholder {
 
 .copy-btn {
     padding: 12px 24px;
-    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    background: var(--accent-gradient);
     border: none;
     border-radius: 25px;
     color: white;
@@ -269,7 +286,7 @@ textarea::placeholder {
 }
 
 .hint {
-    color: #b8b8ff;
+    color: var(--text-secondary);
     font-size: 0.9rem;
     margin-top: 10px;
 }
@@ -280,7 +297,7 @@ textarea::placeholder {
     border-radius: 20px;
     padding: 30px;
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(138, 119, 255, 0.2);
+    border: 1px solid var(--border-color);
 }
 
 .score-board {
@@ -296,7 +313,7 @@ textarea::placeholder {
 
 .player-label {
     font-size: 0.9rem;
-    color: #b8b8ff;
+    color: var(--text-secondary);
     margin-bottom: 8px;
 }
 
@@ -304,7 +321,7 @@ textarea::placeholder {
     font-family: 'Orbitron', monospace;
     font-size: 3rem;
     font-weight: 700;
-    background: linear-gradient(45deg, #8a77ff, #4c9aff);
+    background: var(--accent-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -331,7 +348,7 @@ textarea::placeholder {
 .instructions {
     text-align: center;
     margin-top: 20px;
-    color: #b8b8ff;
+    color: var(--text-secondary);
     font-size: 0.9rem;
 }
 

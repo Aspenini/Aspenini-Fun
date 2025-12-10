@@ -345,7 +345,7 @@ class KevinKlicker {
             if (this.state[k] === undefined) this.state[k] = this.defaultState[k];
           }
           if (!this.state.inventory) this.state.inventory = {};
-          console.log('Loaded Kevin Klicker save from SDK');
+          // Save data loaded from SDK
           this.render();
         }
       }

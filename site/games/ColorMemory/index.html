@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="aspenini-game-id" content="color-memory">
     <title>Color Memory Game - Aspenini-Fun</title>
+    <link rel="stylesheet" href="../shared-theme.css">
     <style>
         /* Hide topbar completely when running inline (hub provides overlay) */
         body.aspenini-inline-mode h1 {
@@ -50,35 +51,43 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #e8e8ff;
+            color: var(--text-primary);
             /* Chromebook optimizations */
             -webkit-font-smoothing: antialiased;
             transform: translateZ(0);
         }
 
+        body.aspenini-inline-mode {
+            background: transparent;
+        }
+
         .game-container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--bg-card);
             padding: 40px;
             border-radius: 20px;
-            backdrop-filter: blur(6px); /* Reduced for better Chromebook performance */
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(6px);
+            border: 1px solid var(--border-color);
             max-width: 500px;
             width: 90%;
-            /* Chromebook optimizations */
             transform: translateZ(0);
         }
 
         h1 {
             margin-bottom: 10px;
             font-size: 2.5rem;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px var(--glow-color);
         }
 
         .subtitle {
             margin-bottom: 30px;
             opacity: 0.8;
             font-size: 1.1rem;
+            color: var(--text-secondary);
         }
 
         .score-board {
@@ -89,22 +98,24 @@
         }
 
         .score-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(138, 119, 255, 0.1);
             padding: 15px;
             border-radius: 10px;
             flex: 1;
+            border: 1px solid var(--border-color);
         }
 
         .score-label {
             font-size: 0.9rem;
             opacity: 0.8;
             margin-bottom: 5px;
+            color: var(--text-secondary);
         }
 
         .score-value {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #4ecdc4;
+            color: var(--accent-primary);
         }
 
         .game-board {

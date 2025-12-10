@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="aspenini-game-id" content="slot-machine">
+    <title>Slot Machine - Aspenini-Fun</title>
+    <link rel="stylesheet" href="../shared-theme.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>🎰 Cosmic Slots 🎰</h1>
+        </div>
+        <div class="topbar-right">
+            <div class="balance-display">
+                <span class="label">Credits:</span>
+                <span id="balance" class="balance">1000</span>
+            </div>
+            <div class="balance-display" style="margin-left: 15px;">
+                <span class="label">High Score:</span>
+                <span id="highScore" class="balance">1000</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <!--sidebar -->
+        <aside class="sidebar">
+            <div class="payouts">
+                <h3>Payouts</h3>
+                <div class="payout-line">
+                    <span class="symbols">💎 💎 💎</span>
+                    <span class="multiplier">1000x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">⭐ ⭐ ⭐</span>
+                    <span class="multiplier">500x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">🍀 🍀 🍀</span>
+                    <span class="multiplier">100x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">7️⃣ 7️⃣ 7️⃣</span>
+                    <span class="multiplier">77x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">🔔 🔔 🔔</span>
+                    <span class="multiplier">50x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">🍒 🍒 🍒</span>
+                    <span class="multiplier">20x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">🍋 🍋 🍋</span>
+                    <span class="multiplier">10x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">🍊 🍊 🍊</span>
+                    <span class="multiplier">5x</span>
+                </div>
+                <div class="payout-line">
+                    <span class="symbols">🍇 🍇 🍇</span>
+                    <span class="multiplier">3x</span>
+                </div>
+                <div class="payout-line special">
+                    <span class="symbols">🍒 🍒 -</span>
+                    <span class="multiplier">2x</span>
+                </div>
+            </div>
+
+            <div class="stats">
+                <h3>Statistics</h3>
+                <div class="stat-item">
+                    <span class="label">Spins:</span>
+                    <span class="value" id="totalSpins">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Wins:</span>
+                    <span class="value" id="totalWins">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="label">Win Rate:</span>
+                    <span class="value" id="winRate">0%</span>
+                </div>
+                <div class="stat-item highlight">
+                    <span class="label">Biggest Win:</span>
+                    <span class="value" id="biggestWin">0</span>
+                </div>
+                <div class="stat-item highlight">
+                    <span class="label">🏆 High Score:</span>
+                    <span class="value" id="highScoreStat">1000</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Slot Machine -->
+        <div class="slot-machine">
+            <div class="machine-top">
+                <div class="title">COSMIC SLOTS</div>
+            </div>
+
+            <div class="machine-body">
+                <div class="display-area">
+                    <div class="win-display" id="winDisplay">SPIN TO WIN!</div>
+                </div>
+
+                <div class="reels-container">
+                    <div class="reel" id="reel1">
+                        <div class="symbol">🍒</div>
+                    </div>
+                    <div class="reel" id="reel2">
+                        <div class="symbol">🍒</div>
+                    </div>
+                    <div class="reel" id="reel3">
+                        <div class="symbol">🍒</div>
+                    </div>
+                </div>
+
+                <div class="controls-area">
+                    <div class="bet-controls">
+                        <button class="bet-btn" id="minBet">MIN (1)</button>
+                        <div class="bet-display">
+                            <span class="label">BET:</span>
+                            <span class="amount" id="betAmount">5</span>
+                        </div>
+                        <button class="bet-btn" id="maxBet">MAX (50)</button>
+                    </div>
+
+                    <button class="spin-btn" id="spinBtn">
+                        <span class="spin-text">SPIN</span>
+                    </button>
+
+                    <div class="bet-adjust">
+                        <button class="adjust-btn" id="decreaseBet">-</button>
+                        <input type="range" id="betSlider" min="1" max="50" value="5" step="1">
+                        <button class="adjust-btn" id="increaseBet">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../aspenini-sdk.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

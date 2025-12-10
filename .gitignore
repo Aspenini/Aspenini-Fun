@@ -1,0 +1,36 @@
+# Aspenini-Fun .gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if you add any build tools later)
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+.cache/
+
+# Tauri build outputs
+src-tauri/target/
+
+# User save data (optional - keep local)
+# site/saves/
+

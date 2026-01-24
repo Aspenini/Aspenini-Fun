@@ -5,6 +5,7 @@ class KevinKlicker {
       score: document.getElementById('score'),
       cps: document.getElementById('cps'),
       perClick: document.getElementById('perClick'),
+      totalClicks: document.getElementById('totalClicks'),
       kevinBtn: document.getElementById('kevinBtn'),
       pop: document.getElementById('pop'),
       shop: document.getElementById('shop'),
@@ -59,6 +60,55 @@ class KevinKlicker {
         onBuy: s => s.cps += 10,
         icon: '🏟️'
       },
+      { 
+        id: 'podcast', 
+        name: "Kevin's Podcast", 
+        desc: '+5 CPS each', 
+        baseCost: 5000, 
+        costScale: 1.22, 
+        onBuy: s => s.cps += 5,
+        icon: '🎙️'
+      },
+      { 
+        id: 'tv', 
+        name: 'Kevin TV Show', 
+        desc: '+25 CPS, one‑time', 
+        baseCost: 15000, 
+        costScale: 1.00, 
+        unique: true, 
+        onBuy: s => s.cps += 25,
+        icon: '📺'
+      },
+      { 
+        id: 'movie', 
+        name: 'Kevin: The Movie', 
+        desc: 'Clicks give +50% more', 
+        baseCost: 50000, 
+        costScale: 1.00, 
+        unique: true, 
+        onBuy: s => s.clickMult *= 1.5,
+        icon: '🎬'
+      },
+      { 
+        id: 'planet', 
+        name: "Kevin's Planet", 
+        desc: '+100 CPS, one‑time', 
+        baseCost: 200000, 
+        costScale: 1.00, 
+        unique: true, 
+        onBuy: s => s.cps += 100,
+        icon: '🪐'
+      },
+      { 
+        id: 'empire', 
+        name: 'Kevin Empire', 
+        desc: 'All CPS +20%', 
+        baseCost: 500000, 
+        costScale: 1.00, 
+        unique: true, 
+        onBuy: s => { s.cpsMult = (s.cpsMult || 1) * 1.2; },
+        icon: '👑'
+      },
     ];
 
     this.defaultState = {
@@ -66,8 +116,24 @@ class KevinKlicker {
       perClick: 1,
       clickMult: 1,
       cps: 0,
+      cpsMult: 1,
+      totalClicks: 0,
+      milestonesReached: [],
       inventory: {}
     };
+
+    this.milestones = [
+      { at: 100, msg: '💯 100 clicks!', emoji: '💯' },
+      { at: 1000, msg: '🔥 1,000 clicks!', emoji: '🔥' },
+      { at: 10000, msg: '⭐ 10K clicks!', emoji: '⭐' },
+      { at: 100000, msg: '💎 100K clicks!', emoji: '💎' },
+      { at: 1000000, msg: '🌟 1 MILLION!', emoji: '🌟' },
+      { at: 10000000, msg: '👑 10 MILLION!', emoji: '👑' },
+      { at: 100000000, msg: '🪐 KEVIN LEGEND!', emoji: '🪐' }
+    ];
+
+    this.GOLDEN_CLICK_CHANCE = 0.02;
+    this.GOLDEN_CLICK_MULT = 10;
 
     this.state = this.loadState();
     this.lastUpdate = performance.now();
@@ -132,21 +198,64 @@ class KevinKlicker {
   }
 
   handleClick() {
-    const add = this.state.perClick * this.state.clickMult;
+    this.state.totalClicks = (this.state.totalClicks || 0) + 1;
+    const baseAdd = this.state.perClick * this.state.clickMult;
+    const isGolden = Math.random() < this.GOLDEN_CLICK_CHANCE;
+    const add = isGolden ? baseAdd * this.GOLDEN_CLICK_MULT : baseAdd;
     this.state.score += add;
-    this.showPopAnimation(add);
-    this.render(); // Update everything including shop
+    this.showPopAnimation(add, isGolden);
+    this.checkMilestones();
+    this.bounceKevin();
+    this.render();
   }
 
-  showPopAnimation(amount) {
-    this.elements.pop.textContent = `+${this.format(amount)}`;
+  bounceKevin() {
+    this.elements.kevinBtn.classList.add('clicked');
+    setTimeout(() => this.elements.kevinBtn.classList.remove('clicked'), 150);
+  }
+
+  showPopAnimation(amount, isGolden = false) {
+    this.elements.pop.textContent = isGolden ? `★ GOLDEN! +${this.format(amount)}` : `+${this.format(amount)}`;
+    this.elements.pop.className = 'pop' + (isGolden ? ' golden' : '');
     this.elements.pop.style.opacity = '1';
     this.elements.pop.style.transform = 'translateY(-6px) scale(1)';
-    
+
     setTimeout(() => {
       this.elements.pop.style.opacity = '0';
       this.elements.pop.style.transform = 'translateY(10px) scale(.9)';
-    }, 160);
+      this.elements.pop.className = 'pop';
+    }, isGolden ? 400 : 160);
+  }
+
+  checkMilestones() {
+    const total = this.state.totalClicks || 0;
+    const reached = this.state.milestonesReached || [];
+    for (const m of this.milestones) {
+      if (total >= m.at && !reached.includes(m.at)) {
+        reached.push(m.at);
+        this.state.milestonesReached = reached;
+        this.showMilestoneToast(m.msg, m.emoji);
+      }
+    }
+  }
+
+  showMilestoneToast(msg, emoji = '🎉') {
+    const el = document.createElement('div');
+    el.className = 'milestone-toast';
+    el.innerHTML = `<span class="milestone-emoji">${emoji}</span> ${msg}`;
+    el.style.cssText = `
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      color: #1a1a2e; padding: 14px 24px; border-radius: 12px;
+      font-weight: 700; font-size: 1.1rem; z-index: 10000;
+      box-shadow: 0 6px 20px rgba(255,215,0,0.5);
+      animation: milestoneIn 0.4s ease;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => {
+      el.style.animation = 'milestoneOut 0.3s ease forwards';
+      setTimeout(() => el.remove(), 300);
+    }, 2500);
   }
 
   startGameLoop() {
@@ -156,7 +265,8 @@ class KevinKlicker {
       
       if (this.state.cps > 0) {
         const oldScore = this.state.score;
-        this.state.score += this.state.cps * dt;
+        const effectiveCps = this.state.cps * (this.state.cpsMult || 1);
+        this.state.score += effectiveCps * dt;
         
         // Only update if score actually changed (to avoid unnecessary renders)
         if (Math.floor(this.state.score) !== Math.floor(oldScore)) {
@@ -232,8 +342,11 @@ class KevinKlicker {
 
   renderStats() {
     this.elements.score.textContent = this.format(this.state.score);
-    this.elements.cps.textContent = this.format(this.state.cps);
+    this.elements.cps.textContent = this.format(this.state.cps * (this.state.cpsMult || 1));
     this.elements.perClick.textContent = this.format(this.state.perClick * this.state.clickMult);
+    if (this.elements.totalClicks) {
+      this.elements.totalClicks.textContent = this.format(this.state.totalClicks || 0);
+    }
   }
 
   renderShop() {
@@ -396,6 +509,15 @@ style.textContent = `
   @keyframes fadeIn {
     from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
     to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  
+  @keyframes milestoneIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  @keyframes milestoneOut {
+    from { opacity: 1; transform: translateX(-50%) translateY(0); }
+    to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
   }
   
   .item-header {

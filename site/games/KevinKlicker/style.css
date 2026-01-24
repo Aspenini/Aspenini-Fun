@@ -145,9 +145,15 @@ button.ghost:hover{
 
 .stats{
   display:grid; 
-  grid-template-columns: repeat(3, 1fr); 
+  grid-template-columns: repeat(4, 1fr); 
   gap:clamp(12px, 1.5vw, 24px); 
   margin-bottom:clamp(10px, 1.5vw, 24px);
+}
+
+@media (max-width: 700px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .stat{
@@ -188,8 +194,13 @@ button.ghost:hover{
   transform: translateZ(0);
   will-change: transform;
 }
-.kevin-btn img{width:82%; user-select:none; pointer-events:none; filter: drop-shadow(0 10px 10px rgba(0,0,0,.35));}
+.kevin-btn img{width:82%; user-select:none; pointer-events:none; filter: drop-shadow(0 10px 10px rgba(0,0,0,.35)); transform-origin: center;}
 .kevin-btn:active{transform: scale(.98)}
+.kevin-btn.clicked img { animation: kevinBounce 0.15s ease; }
+@keyframes kevinBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.92); }
+}
 .pop{
   position:absolute; 
   inset:auto 0 clamp(16px, 2vw, 24px) 0; 
@@ -207,6 +218,14 @@ button.ghost:hover{
   pointer-events:none;
   font-size: clamp(1rem, 1.3vw, 1.3rem);
   z-index: 3;
+}
+
+.pop.golden {
+  background: linear-gradient(135deg, #ffd700, #ffb347);
+  border-color: rgba(255,215,0,0.6);
+  color: #1a1a2e;
+  font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+  box-shadow: 0 4px 20px rgba(255,215,0,0.5);
 }
 
 .hint{

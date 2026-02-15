@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1764121883|27040910';
+const CACHE_VERSION = '1771133055|158539487';
 /** @type {string} */
 const CACHE_PREFIX = 'Rutted-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;

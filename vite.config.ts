@@ -91,7 +91,7 @@ function gamesDiscoveryPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [gamesDiscoveryPlugin()],
-  base: "/Aspenini-Fun/",
+  base: "/",
   build: {
     outDir: "dist",
     emptyOutDir: true,

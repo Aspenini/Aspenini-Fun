@@ -1,0 +1,4 @@
+{
+  "github-actions.workflows.pinned.refresh.enabled": false,
+  "github-actions.org-secrets.enabled": false
+}

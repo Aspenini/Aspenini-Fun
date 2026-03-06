@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch-Off Lottery - Aspenini-Fun</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>🎫 Scratch-Off Lottery</h1>
+        </div>
+        <div class="topbar-right">
+            <div class="balance-display">
+                <span class="label">Credits:</span>
+                <span id="balance" class="balance">1000</span>
+            </div>
+            <div class="balance-display" style="margin-left: 15px;">
+                <span class="label">High Score:</span>
+                <span id="highScore" class="balance">1000</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-container">
+        <!-- Ticket Area (Left) -->
+        <div class="ticket-area">
+            <div class="ticket-container" id="ticketContainer">
+                <div class="ticket-title">🎫 COSMIC LOTTERY 🎫</div>
+                <div class="scratch-areas" id="scratchAreas">
+                    <!-- Scratch areas will be generated here -->
+                </div>
+                <div class="ticket-number">Ticket #<span id="ticketNumber">000001</span></div>
+            </div>
+        </div>
+
+        <!-- Controls & Info Area (Right) -->
+        <aside class="controls-sidebar">
+            <div class="ticket-info">
+                <h3>Ticket Cost</h3>
+                <select id="ticketCost">
+                    <option value="10">10 Credits</option>
+                    <option value="25" selected>25 Credits</option>
+                    <option value="50">50 Credits</option>
+                    <option value="100">100 Credits</option>
+                </select>
+            </div>
+
+            <div class="message-area">
+                <div class="message-box" id="messageBox">
+                    Buy a ticket and scratch to reveal!
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="buyBtn" class="game-btn primary">Buy Ticket</button>
+                <button id="continueBtn" class="game-btn" disabled>Continue</button>
+            </div>
+
+            <div class="prizes-table">
+                <h3>Prize Table</h3>
+                <div class="prize-item">
+                    <span class="prize-icon">💎💎💎</span>
+                    <span class="prize-value">1000x</span>
+                </div>
+                <div class="prize-item">
+                    <span class="prize-icon">⭐⭐⭐</span>
+                    <span class="prize-value">500x</span>
+                </div>
+                <div class="prize-item">
+                    <span class="prize-icon">🍀🍀🍀</span>
+                    <span class="prize-value">100x</span>
+                </div>
+                <div class="prize-item">
+                    <span class="prize-icon">🎰🎰🎰</span>
+                    <span class="prize-value">50x</span>
+                </div>
+                <div class="prize-item">
+                    <span class="prize-icon">🍒🍒🍒</span>
+                    <span class="prize-value">25x</span>
+                </div>
+                <div class="prize-item">
+                    <span class="prize-icon">🔔🔔🔔</span>
+                    <span class="prize-value">10x</span>
+                </div>
+                <div class="prize-item">
+                    <span class="prize-icon">🍋🍋🍋</span>
+                    <span class="prize-value">5x</span>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3>Statistics</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Played:</span>
+                    <span class="stat-value" id="ticketsPlayed">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Won:</span>
+                    <span class="stat-value" id="ticketsWon">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Won:</span>
+                    <span class="stat-value" id="totalWinnings">0</span>
+                </div>
+                <div class="stat-item highlight">
+                    <span class="stat-label">Biggest:</span>
+                    <span class="stat-value" id="biggestWin">0</span>
+                </div>
+                <div class="stat-item highlight">
+                    <span class="stat-label">🏆 High Score:</span>
+                    <span class="stat-value" id="highScoreStat">1000</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        if (window.self !== window.top) document.body.classList.add('hub-iframe-mode');
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
+

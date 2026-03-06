@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kevin Klicker</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      :root {
+        --bg: #0f0f18;
+        --panel: #1a1a26;
+        --panel-hover: #222230;
+        --accent: #8b5cf6;
+        --accent-blue: #3b82f6;
+        --accent-glow: rgba(139, 92, 246, 0.35);
+        --text: #e8eaf0;
+        --muted: #6b7280;
+        --green: #22c55e;
+        --gold: #fbbf24;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', system-ui, sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+        user-select: none;
+        position: relative;
+      }
+
+      .header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 56px;
+        background: var(--panel);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .header-bar h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.02em;
+      }
+
+      .main {
+        display: flex;
+        min-height: calc(100vh - 56px);
+      }
+
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 20px;
+        min-width: 0;
+      }
+
+      .stats-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stat-card {
+        background: var(--panel);
+        border-radius: 10px;
+        padding: 14px 20px;
+        min-width: 100px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .stat-card .label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .stat-card .value {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .kevin-circle {
+        width: clamp(200px, 32vmin, 320px);
+        height: clamp(200px, 32vmin, 320px);
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent) 50%, #6366f1 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.08s ease, box-shadow 0.2s ease;
+        box-shadow: 0 8px 32px rgba(139, 92, 246, 0.35);
+        margin-bottom: 20px;
+      }
+
+      .kevin-circle:hover {
+        transform: scale(1.03);
+        box-shadow: 0 12px 40px rgba(139, 92, 246, 0.45);
+      }
+
+      .kevin-circle:active {
+        transform: scale(0.97);
+      }
+
+      .kevin-circle-inner {
+        width: 88%;
+        height: 88%;
+        border-radius: 50%;
+        overflow: hidden;
+        background: var(--panel);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .kevin-circle-inner img {
+        width: 85%;
+        height: 85%;
+        object-fit: contain;
+        pointer-events: none;
+      }
+
+      .tip-line {
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-align: center;
+        max-width: 480px;
+        line-height: 1.5;
+      }
+
+      .sidebar {
+        width: 320px;
+        flex-shrink: 0;
+        background: var(--panel);
+        border-radius: 16px 0 0 16px;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-right: none;
+        overflow-y: auto;
+        max-height: calc(100vh - 56px);
+      }
+
+      .sidebar-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        padding: 16px 18px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .upgrade {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+
+      .upgrade:hover:not(.locked) {
+        background: var(--panel-hover);
+      }
+
+      .upgrade.locked {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
+      .upgrade-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(139, 92, 246, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+
+      .upgrade-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .upgrade-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--text);
+      }
+
+      .upgrade-desc {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      .upgrade-cost {
+        padding: 6px 12px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text);
+        white-space: nowrap;
+      }
+
+      .upgrade-cost.cant-afford {
+        color: #94a3b8;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--panel);
+        color: var(--gold);
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        z-index: 100;
+      }
+
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+
+      .golden-flash {
+        animation: goldenFlash 0.4s ease;
+      }
+
+      @keyframes goldenFlash {
+        0%, 100% { filter: none; }
+        50% { filter: brightness(1.4) saturate(1.3); box-shadow: 0 0 60px rgba(251, 191, 36, 0.8); }
+      }
+
+      @media (max-width: 700px) {
+        .main {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          border-radius: 16px 16px 0 0;
+          border-right: 1px solid rgba(255,255,255,0.06);
+          max-height: 40vh;
+        }
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="header-bar">
+      <h1>Kevin Klicker</h1>
+    </header>
+
+    <div class="main">
+      <div class="content">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="label">Clicks</div>
+            <div class="value" id="statClicks">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">CPS</div>
+            <div class="value" id="statCps">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Per Click</div>
+            <div class="value" id="statPerClick">1</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Total Clicks</div>
+            <div class="value" id="statTotalClicks">0</div>
+          </div>
+        </div>
+
+        <div class="kevin-circle" id="clickZone" aria-label="Click Kevin Allen">
+          <div class="kevin-circle-inner">
+            <img src="kevin.png" alt="Kevin Allen" />
+          </div>
+        </div>
+
+        <p class="tip-line">
+          Tip: Buy upgrades on the right. 2% chance for a <strong style="color: var(--gold);">GOLDEN</strong> click (10x)! Hit 100, 1K, 10K… for milestone toasts. Progress saves automatically.
+        </p>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sidebar-title">Upgrades</div>
+        <div id="upgrades"></div>
+      </aside>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+
+    <script>
+      (function () {
+        const SAVE_KEY = 'kevin-klicker-save';
+        const GOLDEN_CHANCE = 0.02;
+        const GOLDEN_MULT = 10;
+        const MILESTONES = [100, 1000, 10000, 100000, 1e6, 1e9];
+
+        const upgradesDef = [
+          { id: 'stronger', name: 'Stronger Click', desc: '+1 per click', icon: '💪', cost: 15, costBase: 15, owned: 0, effect: () => { state.perClick += 1; } },
+          { id: 'autoclick', name: 'Auto-Clicker', desc: '+0.2 CPS each', icon: '👆', cost: 50, costBase: 50, owned: 0, effect: () => { state.perSec += 0.2; } },
+          { id: 'crew', name: 'Kevin Crew', desc: '+2 CPS each', icon: '👥', cost: 300, costBase: 300, owned: 0, effect: () => { state.perSec += 2; } },
+          { id: 'billboard', name: 'Billboard Hype', desc: 'Clicks give +25% more', icon: '📢', cost: 750, costBase: 750, owned: 0, effect: () => { state.clickMult += 0.25; } },
+          { id: 'stadium', name: 'Stadium Event', desc: '+10 CPS, one-time', icon: '🏟️', cost: 2000, costBase: 2000, owned: 0, oneTime: true, effect: () => { state.perSec += 10; } },
+          { id: 'podcast', name: "Kevin's Podcast", desc: '+5 CPS each', icon: '🎙️', cost: 5000, costBase: 5000, owned: 0, effect: () => { state.perSec += 5; } },
+          { id: 'tvshow', name: 'Kevin TV Show', desc: '+25 CPS, one-time', icon: '📺', cost: 15000, costBase: 15000, owned: 0, oneTime: true, effect: () => { state.perSec += 25; } },
+          { id: 'movie', name: "Kevin: The Movie", desc: 'Clicks give +50% more', icon: '🎬', cost: 50000, costBase: 50000, owned: 0, effect: () => { state.clickMult += 0.5; } },
+        ];
+
+        const state = {
+          klicks: 0,
+          totalClicks: 0,
+          perClick: 1,
+          perSec: 0,
+          clickMult: 1,
+          upgrades: upgradesDef.map(u => ({ ...u })),
+          lastMilestone: 0,
+        };
+
+        const statClicks = document.getElementById('statClicks');
+        const statCps = document.getElementById('statCps');
+        const statPerClick = document.getElementById('statPerClick');
+        const statTotalClicks = document.getElementById('statTotalClicks');
+        const clickZone = document.getElementById('clickZone');
+        const upgradesEl = document.getElementById('upgrades');
+        const toastEl = document.getElementById('toast');
+
+        let lastAffordKey = '';
+
+        function format(n) {
+          if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+          if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+          if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+          return Math.floor(n).toLocaleString();
+        }
+
+        function showToast(msg) {
+          toastEl.textContent = msg;
+          toastEl.classList.add('show');
+          setTimeout(() => toastEl.classList.remove('show'), 2500);
+        }
+
+        function checkMilestones() {
+          const k = Math.floor(state.klicks);
+          for (const m of MILESTONES) {
+            if (k >= m && state.lastMilestone < m) {
+              state.lastMilestone = m;
+              showToast('Milestone: ' + format(m) + ' clicks!');
+              break;
+            }
+          }
+        }
+
+        function save() {
+          try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify({
+              klicks: state.klicks,
+              totalClicks: state.totalClicks,
+              lastMilestone: state.lastMilestone,
+              upgrades: state.upgrades.map(u => ({ id: u.id, owned: u.owned, cost: u.cost })),
+            }));
+          } catch (e) {}
+        }
+
+        function load() {
+          try {
+            const raw = localStorage.getItem(SAVE_KEY);
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            state.klicks = data.klicks ?? 0;
+            state.totalClicks = data.totalClicks ?? 0;
+            state.lastMilestone = data.lastMilestone ?? 0;
+            const upMap = {};
+            (data.upgrades || []).forEach(u => { upMap[u.id] = u; });
+            state.upgrades.forEach(u => {
+              const saved = upMap[u.id];
+              if (saved) {
+                u.owned = saved.owned ?? 0;
+                u.cost = saved.cost ?? u.costBase;
+              }
+            });
+            applyAllUpgradeEffects();
+          } catch (e) {}
+        }
+
+        function applyAllUpgradeEffects() {
+          state.perClick = 1;
+          state.perSec = 0;
+          state.clickMult = 1;
+          state.upgrades.forEach(u => {
+            for (let i = 0; i < u.owned; i++) u.effect();
+          });
+        }
+
+        function tick() {
+          state.klicks += state.perSec / 10;
+          checkMilestones();
+          updateStats();
+          const affordKey = state.upgrades.map(u => (state.klicks >= u.cost && !(u.oneTime && u.owned >= 1)) ? '1' : '0').join('');
+          if (affordKey !== lastAffordKey) {
+            lastAffordKey = affordKey;
+            renderUpgrades();
+          }
+          save();
+        }
+
+        setInterval(tick, 100);
+
+        function updateStats() {
+          statClicks.textContent = format(state.klicks);
+          statCps.textContent = state.perSec >= 1 ? format(state.perSec) : state.perSec.toFixed(1);
+          statPerClick.textContent = format(state.perClick);
+          statTotalClicks.textContent = format(state.totalClicks);
+        }
+
+        function renderUpgrades() {
+          upgradesEl.innerHTML = state.upgrades.map(u => {
+            const canAfford = state.klicks >= u.cost;
+            const maxed = u.oneTime && u.owned >= 1;
+            return `
+              <div class="upgrade ${canAfford && !maxed ? '' : 'locked'}" data-id="${u.id}">
+                <div class="upgrade-icon">${u.icon}</div>
+                <div class="upgrade-info">
+                  <div class="upgrade-name">${u.name}</div>
+                  <div class="upgrade-desc">${u.desc}</div>
+                </div>
+                <div class="upgrade-cost ${canAfford && !maxed ? '' : 'cant-afford'}">${maxed ? 'Done' : 'Need ' + format(u.cost)}</div>
+              </div>
+            `;
+          }).join('');
+
+          upgradesEl.querySelectorAll('.upgrade').forEach(el => {
+            if (el.classList.contains('locked')) return;
+            el.onclick = () => {
+              const u = state.upgrades.find(x => x.id === el.dataset.id);
+              if (!u || state.klicks < u.cost) return;
+              if (u.oneTime && u.owned >= 1) return;
+              state.klicks -= u.cost;
+              u.owned += 1;
+              if (!u.oneTime) u.cost = Math.floor(u.costBase * Math.pow(1.15, u.owned));
+              u.effect();
+              renderUpgrades();
+              save();
+            };
+          });
+        }
+
+        clickZone.addEventListener('click', () => {
+          const isGolden = Math.random() < GOLDEN_CHANCE;
+          const mult = isGolden ? GOLDEN_MULT * state.clickMult : state.clickMult;
+          const gain = state.perClick * mult;
+          state.klicks += gain;
+          state.totalClicks += 1;
+          if (isGolden) {
+            clickZone.classList.add('golden-flash');
+            setTimeout(() => clickZone.classList.remove('golden-flash'), 400);
+            showToast('GOLDEN click! +' + format(gain));
+          }
+          checkMilestones();
+          updateStats();
+          save();
+        });
+
+        load();
+        updateStats();
+        lastAffordKey = state.upgrades.map(u => (state.klicks >= u.cost && !(u.oneTime && u.owned >= 1)) ? '1' : '0').join('');
+        renderUpgrades();
+      })();
+    </script>
+  </body>
+</html>

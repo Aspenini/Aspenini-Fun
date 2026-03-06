@@ -1,99 +1,84 @@
-# 🎮 Aspenini-Fun Game Hub
+# Aspenini Fun
 
-A modern HTML5 game hub with themes, account system, and game SDK.
+A static game hub built with TypeScript + Vite. Games are auto-discovered at build time — no registry to maintain.
 
-## Features
-
-- **7 Space Themes** - Real-time theme switching with persistent preferences
-- **Account System** - Save game progress across sessions with export/import
-- **Game SDK** - Easy integration for developers with auto-save and theme support
-- **Responsive** - Optimized for desktop, mobile, and Chromebooks
-- **Offline Ready** - Works via HTTP server or file:// protocol
-
-## Quick Start
+## Setup
 
 ```bash
-cd site
-python -m http.server 8080
-# Open http://localhost:8080
+npm install
 ```
 
-Or just open `site/index.html` in your browser.
+## Development
 
-## Adding Games
+```bash
+npm run dev
+```
 
-1. Create game folder in `site/games/YourGame/`
-2. Add to `site/games.json`:
+Opens at `http://localhost:5173`. Hot-reloads when you edit `game.json` files.
+
+## Build
+
+```bash
+npm run build
+```
+
+Outputs a fully static site to `dist/`. Serve it with any static host (GitHub Pages, Netlify, Caddy, nginx, etc.).
+
+```bash
+npm run preview   # preview the built dist/ locally
+```
+
+---
+
+## Adding a Game
+
+1. Create a folder in `public/games/<your-game-name>/`
+2. Add a `game.json` inside it:
+
 ```json
 {
-  "id": "your-game",
-  "title": "Your Game",
-  "description": "Game description",
-  "icon": "🎮",
-  "path": "games/YourGame/index.html",
-  "inline": true
+  "title": "My Game",
+  "description": "A short description shown on the tile.",
+  "thumbnail": "thumbnail.png",
+  "tags": ["Action", "Puzzle"]
 }
 ```
 
-## SDK Integration
+- `thumbnail` — path relative to the game folder. Can be a `.png`, `.jpg`, or `.svg`.
+- `tags` — optional array of tag strings shown as badges on the tile.
 
-**HTML:**
-```html
-<meta name="aspenini-game-id" content="your-game">
-<link rel="stylesheet" href="../shared-theme.css">
-<script src="../../aspenini-sdk.js"></script>
+3. Add your game's `index.html` (and any other files) to the same folder.
+
+That's it. The Vite plugin scans `public/games/*/game.json` automatically at compile time and dev-time. No source files to edit.
+
+### Example structure
+
+```
+public/
+└── games/
+    └── my-game/
+        ├── game.json       ← metadata
+        ├── thumbnail.png   ← tile artwork
+        └── index.html      ← the actual game
 ```
 
-**JavaScript:**
-```javascript
-// Load save data
-const save = Aspenini.load();
-
-// Save progress
-Aspenini.save({ score: 100, level: 5 });
-```
-
-**CSS (for theme support):**
-```css
-button {
-  background: var(--accent-gradient);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-```
+---
 
 ## Project Structure
 
 ```
-site/
-├── index.html              # Hub page
-├── games.json              # Game database
-├── aspenini-sdk.js        # SDK for games
-├── themes.css             # Theme system
-└── games/
-    ├── shared-theme.css   # Theme variables
-    └── YourGame/          # Game folders
+Aspenini-Fun/
+├── public/
+│   └── games/          ← your games live here
+├── src/
+│   ├── main.ts         ← entry point + starfield
+│   ├── hub.ts          ← game grid / tile rendering
+│   ├── viewer.ts       ← iframe viewer + back button
+│   ├── style.css       ← all styles
+│   └── types/
+│       └── virtual-games.d.ts   ← TS types for virtual:games module
+├── index.html
+├── vite.config.ts      ← build config + games discovery plugin
+├── tsconfig.json
+└── package.json
 ```
-
-## Theme System
-
-7 themes available: Deep Space, Cosmic Blue, Aurora Green, Solar Red, Nebula Pink, Midnight Cyan, Dark Matter
-
-Themes automatically sync to games using CSS variables and postMessage API.
-
-## Account System
-
-- Create account with username
-- Auto-save game progress
-- Export as `.afs` file or copy/paste
-- Import to restore data
-
-## Browser Support
-
-✅ Chrome, Edge, Firefox, Safari  
-✅ Chromebook optimized  
-⚠️ Use HTTP server for best compatibility
-
----
-
-**Made with ❤️ for the gaming community**

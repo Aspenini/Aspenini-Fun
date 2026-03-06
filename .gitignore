@@ -1,36 +1,37 @@
-# Aspenini-Fun .gitignore
-
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Node modules (if you add any build tools later)
+# Dependencies
 node_modules/
-package-lock.json
 
-# Build outputs
+# Build output
 dist/
-build/
+
+# Environment
+.env
+.env.local
+.env.*.local
 
 # Logs
 *.log
 npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Temporary files
-*.tmp
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Cache
 .cache/
+.parcel-cache/
+.vite/
 
-# Tauri build outputs
-src-tauri/target/
-
-# User save data (optional - keep local)
-# site/saves/
-
+# Optional: uncomment to ignore local IDE settings
+# .idea/

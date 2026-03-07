@@ -2,6 +2,9 @@ import "./style.css";
 import { Game } from "virtual:games";
 import { createHub } from "./hub";
 import { createViewer } from "./viewer";
+import { initTheme } from "./themes";
+
+initTheme();
 
 const app = document.getElementById("app")!;
 

@@ -1,4 +1,5 @@
 import { games, Game } from "virtual:games";
+import { createThemePicker } from "./themes";
 
 export function createHub(onLaunch: (game: Game) => void): HTMLElement {
   const hub = document.createElement("div");
@@ -6,13 +7,22 @@ export function createHub(onLaunch: (game: Game) => void): HTMLElement {
 
   const header = document.createElement("header");
   header.className = "hub-header";
-  header.innerHTML = `
+
+  const headerRow = document.createElement("div");
+  headerRow.className = "hub-header-row";
+
+  const logoBlock = document.createElement("div");
+  logoBlock.innerHTML = `
     <div class="hub-logo">
       <span class="hub-logo-accent">ASPENINI</span>
       <span class="hub-logo-main">FUN</span>
     </div>
     <p class="hub-subtitle">Select a game to play</p>
   `;
+
+  headerRow.appendChild(logoBlock);
+  headerRow.appendChild(createThemePicker());
+  header.appendChild(headerRow);
 
   const grid = document.createElement("div");
   grid.className = "hub-grid";

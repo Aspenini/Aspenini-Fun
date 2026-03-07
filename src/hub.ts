@@ -45,17 +45,21 @@ function createTile(game: Game, onLaunch: (game: Game) => void): HTMLElement {
 
   const hasThumbnail = game.thumbnail && !game.thumbnail.endsWith("//");
   const thumbUrl = hasThumbnail ? `${import.meta.env.BASE_URL}${game.thumbnail}` : "";
+  const escapedTitle = escapeHtml(game.title);
+  const escapedDescription = escapeHtml(game.description);
 
   tile.innerHTML = `
-    <div class="tile-bg" style="${hasThumbnail ? `background-image: url('${thumbUrl}')` : ""}"></div>
+    <div class="tile-bg">
+      ${hasThumbnail ? `<img class="tile-thumb" src="${thumbUrl}" alt="" loading="lazy" decoding="async" />` : ""}
+    </div>
     <div class="tile-overlay"></div>
     <div class="tile-content">
       <div class="tile-tags">
         ${game.tags.map((t) => `<span class="tile-tag">${t}</span>`).join("")}
       </div>
       <div class="tile-info">
-        <h2 class="tile-title">${escapeHtml(game.title)}</h2>
-        <p class="tile-description">${escapeHtml(game.description)}</p>
+        <h2 class="tile-title">${escapedTitle}</h2>
+        <p class="tile-description">${escapedDescription}</p>
       </div>
     </div>
     <div class="tile-play-hint">
